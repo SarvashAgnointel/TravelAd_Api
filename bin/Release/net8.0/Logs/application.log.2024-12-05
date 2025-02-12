@@ -1,0 +1,48 @@
+2024-12-05 19:54:13,130 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 19:54:13,164 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 19:54:13,165 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 19:54:13,166 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 19:54:16,675 [.NET TP Worker] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 19:54:30,025 [.NET TP Worker] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Successfully retrieved country list from the database.
+2024-12-05 19:54:30,044 [.NET TP Worker] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Number of countries retrieved: 11
+2024-12-05 20:16:21,271 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 20:16:21,293 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 20:16:21,295 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 20:16:21,295 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 20:16:23,713 [.NET TP Worker] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 20:16:36,100 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 20:16:36,122 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 20:16:36,123 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 20:16:36,123 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 20:16:41,053 [.NET TP Worker] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 20:26:44,658 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 20:26:44,791 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 20:26:44,792 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 20:26:44,792 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 20:26:49,152 [9] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 20:27:01,972 [10] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Successfully retrieved country list from the database.
+2024-12-05 20:27:01,981 [10] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Number of countries retrieved: 11
+2024-12-05 22:21:19,050 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 22:21:19,139 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 22:21:19,142 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 22:21:19,142 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 22:21:33,254 [10] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 22:29:52,979 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 22:29:53,004 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 22:29:53,005 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 22:29:53,005 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 22:29:56,237 [10] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 22:30:08,742 [7] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Successfully retrieved country list from the database.
+2024-12-05 22:30:08,754 [7] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Number of countries retrieved: 11
+2024-12-05 22:38:52,301 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 22:38:52,340 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 22:38:52,344 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 22:38:52,344 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 22:38:59,934 [9] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 22:39:45,970 [1] INFO  Microsoft.Hosting.Lifetime - Now listening on: http://localhost:5008
+2024-12-05 22:39:45,990 [1] INFO  Microsoft.Hosting.Lifetime - Application started. Press Ctrl+C to shut down.
+2024-12-05 22:39:45,991 [1] INFO  Microsoft.Hosting.Lifetime - Hosting environment: Development
+2024-12-05 22:39:45,991 [1] INFO  Microsoft.Hosting.Lifetime - Content root path: D:\TravelAd\Code\TravelAD\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
+2024-12-05 22:39:54,537 [13] WARN  Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware - Failed to determine the https port for redirect.
+2024-12-05 22:40:07,577 [9] INFO  TravelAd_Api.Controllers.AdvertiserAccountController -  Maha Executing stored procedure: {StoredProcedure}
+2024-12-05 22:40:10,744 [9] INFO  TravelAd_Api.Controllers.AdvertiserAccountController - Successfully retrieved country list from the database.
