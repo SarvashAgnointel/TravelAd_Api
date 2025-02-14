@@ -15,6 +15,7 @@ using static System.Net.WebRequestMethods;
 using Azure;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 
 public class Dialler
 {
@@ -85,7 +86,7 @@ public class Dialler
                 if (dt.Rows.Count > 0)
                 {
                     var messageCounter = new MessageCounter();
-                    var campaignData = new List<(string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate, string endDate, string messageFrequency, string deliveryStartTime, string deliveryEndTime, string workspaceInfoId, int serverId, int campaignBudget)>();
+                    var campaignData = new List<(string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate, string endDate, string messageFrequency, string deliveryStartTime, string deliveryEndTime, string workspaceInfoId, int serverId, string smsNumber, int campaignBudget)>();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -105,6 +106,7 @@ public class Dialler
                             deliveryEndTime: row["delivery_end_time"].ToString(),
                             workspaceInfoId: row["workspace_id"].ToString(),
                             serverId: Convert.ToInt32(row["smpp_id"]),
+                            smsNumber: row["sms_number"].ToString(),
                             campaignBudget: Convert.ToInt32(row["campaign_budget"])
 
                         ));
@@ -152,7 +154,7 @@ public class Dialler
                             {
                                 if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                 {
-                                    RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.endDate), messageCounter);
+                                    RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
 
                                 }
                                 else
@@ -170,7 +172,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -192,7 +194,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -220,7 +222,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         //Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -309,7 +311,7 @@ public class Dialler
 
     private async void RunCampaign(
       (string campaignId, string listId, string firstName, string lastName, string phoneNo,
-      string campaignName, string templateName, string channelType, string startDate, int serverId, string endDate) campaign,
+      string campaignName, string templateName, string channelType, string startDate, int serverId, string smsNumber, string endDate) campaign,
       MessageCounter messageCounter)
     {
         var parameters = new Dictionary<string, object>
@@ -343,7 +345,7 @@ public class Dialler
     }
 
 
-    private async Task ProcessCampaign((string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate,int serverId, string endDate) campaign, MessageCounter messageCounter)
+    private async Task ProcessCampaign((string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate,int serverId, string smsNumber, string endDate) campaign, MessageCounter messageCounter)
     {
         try
         {
@@ -384,6 +386,7 @@ public class Dialler
                     campaign.endDate,
                     campaign.templateName,
                     campaign.serverId,
+                    campaign.smsNumber,
                     messageCounter
                 );
             }
@@ -849,6 +852,7 @@ public class Dialler
         string end_time,
         string templateName,
         int serverId,
+        string smsNumber,
         MessageCounter messageCounter)
     {
         int msg_count = 0;
@@ -862,7 +866,7 @@ public class Dialler
         string components = dtmain1.Rows[0]["components"].ToString();
         string templateId = dtmain1.Rows[0]["template_id"].ToString();
 
-        List<Component> componentList = JsonConvert.DeserializeObject<List<Component>>(components);
+        List<SMSComponent> componentList = JsonConvert.DeserializeObject<List<SMSComponent>>(components);
 
         // Access the 'text' field of the first component
         if (componentList != null && componentList.Count > 0)
@@ -886,8 +890,6 @@ public class Dialler
             int workspaceid = Convert.ToInt32(dt.Rows[0]["workspace_id"]);
             Console.WriteLine("Workspace ID: " + workspaceid);
 
-            var workspace = dbHandler.ExecuteDataTable($"EXEC GetWorkspaceNamebyId {(workspaceid.ToString())}");
-            string workspaceName = workspace.Rows[0]["workspace_name"]?.ToString();
             Dialler dialler = new Dialler(dbHandler);
 
             // Ensure serverId is not null
@@ -915,7 +917,7 @@ public class Dialler
                     // Prepare the message payload for sending the request
                     var messagePayload = new
                     {
-                        Sender = workspaceName,  // Replace with the actual sender ID
+                        Sender = smsNumber,  // Replace with the actual sender ID
                         Receiver = callernumber,
                         Message = componentList[0].text,  // Extracted text from the components JSON
                         ChannelId = serverId

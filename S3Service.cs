@@ -9,6 +9,7 @@ using CsvHelper;
 using System.Globalization;
 using OfficeOpenXml;
 using System.Dynamic;
+using Org.BouncyCastle.Crypto.Tls;
 
 public class S3Service
 {
@@ -23,8 +24,9 @@ public class S3Service
         _configuration = configuration;
         _dbHandler = dbHandler;
 
-        var awsCredentials = new SessionAWSCredentials("ASIA4SDNVWWK6YBJVLL5", "esOAxR7EFLq5Scojq9q/zVeN10rLF9xGWS9/UPFU", "IQoJb3JpZ2luX2VjEJ///////////wEaCXVzLWVhc3QtMSJIMEYCIQDg6dHR2CyO30Lqztd1FDo6SKWRu1jNWuRs23lTT07cFgIhAJT3ZqEHdkaflhxUIHl22OmflPpbMhsEGWdXk+5CwlJjKvQCCLj//////////wEQABoMODYzNTE4NDM4ODA1IgxwfjGKRusLapZyGWcqyAILNfv5fKkCW19dYN+sbpW7KODF7JZswtUl7HRV1qHzHh0VjHaeRjlEerGRqw68n5vO9cl0QUTbL672tdVYSAI8hIrgdIctdrmC1yNQ9gA+EGRlMLyLAjHLB1a0lMeco6/nJ8ttScM+JrIaywHQDTvIEHNv4YyFbdpj6w/UYiWOwn2Quy7iewANcGOLXXC/6sEGkx2emyPfolLbUBZU3lo2Iek/e2/Ov2svNRD9zEv5b6v5nSHz00p+0yv6uZx94Nop5Qm783k9OCMcXPmRz4UrUaaIHpf9WAaQMJvCmLevDPfruFARVvpfg1gErnj5VvHarL/sKnJYph56BAJbQ0AvOB/ZXvRmnWBnR1Mo7iKN5i1hCsZ3wFlo/TUTQlEkJDZWEMXb0mIaX2354O6t8PvdjmfLil9m9fSBStYRbEXSVGiHG7TCR8wRMOm4pr0GOqYBuz5zvUrvkb1riAcTNwg04gJNPf+Ai/yynb1/ChPqJcFgpvVYmUrmvxcePUH6ifdMFcYdeOJ1MgiKxrgViVhvbhEVk1YqdQV8OojgcHHGCaER8JvbsiVPGojjLtLYaIzyEQx2jueWgVHcjrMGVpKdeOpye9taoURMgIWQkoynTBZydnjLvgxnR/iVSPt3iIZmTJSb8rpDLHuY1OOW5YiXXu9g++Mn9g==");
-        _s3Client = new AmazonS3Client(awsCredentials, RegionEndpoint.USEast1); // Correct initialization
+        //var awsCredentials = new SessionAWSCredentials("ASIA4SDNVWWK6YBJVLL5", "esOAxR7EFLq5Scojq9q/zVeN10rLF9xGWS9/UPFU", "IQoJb3JpZ2luX2VjEJ///////////wEaCXVzLWVhc3QtMSJIMEYCIQDg6dHR2CyO30Lqztd1FDo6SKWRu1jNWuRs23lTT07cFgIhAJT3ZqEHdkaflhxUIHl22OmflPpbMhsEGWdXk+5CwlJjKvQCCLj//////////wEQABoMODYzNTE4NDM4ODA1IgxwfjGKRusLapZyGWcqyAILNfv5fKkCW19dYN+sbpW7KODF7JZswtUl7HRV1qHzHh0VjHaeRjlEerGRqw68n5vO9cl0QUTbL672tdVYSAI8hIrgdIctdrmC1yNQ9gA+EGRlMLyLAjHLB1a0lMeco6/nJ8ttScM+JrIaywHQDTvIEHNv4YyFbdpj6w/UYiWOwn2Quy7iewANcGOLXXC/6sEGkx2emyPfolLbUBZU3lo2Iek/e2/Ov2svNRD9zEv5b6v5nSHz00p+0yv6uZx94Nop5Qm783k9OCMcXPmRz4UrUaaIHpf9WAaQMJvCmLevDPfruFARVvpfg1gErnj5VvHarL/sKnJYph56BAJbQ0AvOB/ZXvRmnWBnR1Mo7iKN5i1hCsZ3wFlo/TUTQlEkJDZWEMXb0mIaX2354O6t8PvdjmfLil9m9fSBStYRbEXSVGiHG7TCR8wRMOm4pr0GOqYBuz5zvUrvkb1riAcTNwg04gJNPf+Ai/yynb1/ChPqJcFgpvVYmUrmvxcePUH6ifdMFcYdeOJ1MgiKxrgViVhvbhEVk1YqdQV8OojgcHHGCaER8JvbsiVPGojjLtLYaIzyEQx2jueWgVHcjrMGVpKdeOpye9taoURMgIWQkoynTBZydnjLvgxnR/iVSPt3iIZmTJSb8rpDLHuY1OOW5YiXXu9g++Mn9g==");
+        //_s3Client = new AmazonS3Client(awsCredentials, RegionEndpoint.USEast1);
+        _s3Client = new AmazonS3Client(RegionEndpoint.USEast1);// Correct initialization
     }
 
     private IDbHandler DbHandler => _dbHandler;

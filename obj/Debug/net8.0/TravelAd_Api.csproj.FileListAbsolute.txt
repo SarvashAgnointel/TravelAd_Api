@@ -1091,9 +1091,3 @@ D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\AWSSDK.S3.dll
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\CsvHelper.dll
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\BouncyCastle.Crypto.dll
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\log4net.config
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\appsettings.Development.json
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\appsettings.json
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\TravelAd_Api.deps.json
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\TravelAd_Api.runtimeconfig.json
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Debug\net8.0\publish\TravelAd_Api.staticwebassets.endpoints.json

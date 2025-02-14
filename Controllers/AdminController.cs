@@ -1069,7 +1069,7 @@ namespace TravelAd_Api.Controllers
                 {
                     WorkspaceName = row.Field<string>("workspace_name"),
                     Status = row["status"] == DBNull.Value ? "No Contacts" : row.Field<string>("status"),
-                    pdatedAt = row["updated_date"] == DBNull.Value ? (DateTime?)null : row.Field<DateTime?>("updated_date"),
+                    UpdatedAt = row["updated_date"] == DBNull.Value ? (DateTime?)null : row.Field<DateTime?>("updated_date"),
                     RecipientCount = row["recipient"] == DBNull.Value ? 0 : row.Field<int>("recipient"),
                     WorkspaceId = row.Field<int>("workspace_id")
                 }).ToList();
@@ -1091,7 +1091,6 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
-
 
     }
 }

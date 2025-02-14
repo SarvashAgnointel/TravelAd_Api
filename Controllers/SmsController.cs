@@ -39,7 +39,7 @@ namespace TravelAd_Api.Controllers
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
 
                 // Create the full URL for the endpoint you want to call
-                var url = $"{otherProjectBaseUrl}/Message/api/getchannels";
+                var url = $"{otherProjectBaseUrl}/Message/getchannels";
 
                 // Make the HTTP GET request
                 var response = await _httpClient.GetAsync(url);
@@ -79,7 +79,7 @@ namespace TravelAd_Api.Controllers
                 }
 
                 // Construct full URL
-                var url = $"{otherProjectBaseUrl}/Message/api/createchannel";
+                var url = $"{otherProjectBaseUrl}/Message/createchannel";
 
                 // Serialize the request body
                 var jsonContent = new StringContent(JsonConvert.SerializeObject(cc), Encoding.UTF8, "application/json");
@@ -120,7 +120,7 @@ namespace TravelAd_Api.Controllers
             try
             {
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var url = $"{otherProjectBaseUrl}/Message/api/connect";
+                var url = $"{otherProjectBaseUrl}/Message/connect";
 
                 var jsonContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(url, jsonContent);
@@ -143,7 +143,7 @@ namespace TravelAd_Api.Controllers
             try
             {
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var url = $"{otherProjectBaseUrl}/Message/api/send";
+                var url = $"{otherProjectBaseUrl}/Message/send";
 
                 var jsonContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(url, jsonContent);
@@ -172,7 +172,7 @@ namespace TravelAd_Api.Controllers
             try
             {
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var url = $"{otherProjectBaseUrl}/Message/api/sendBulk";
+                var url = $"{otherProjectBaseUrl}/Message/sendBulk";
 
                 var jsonContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync(url, jsonContent);
@@ -193,7 +193,7 @@ namespace TravelAd_Api.Controllers
             try
             {
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var url = $"{otherProjectBaseUrl}/Message/api/disconnect?channelId={channelId}";
+                var url = $"{otherProjectBaseUrl}/Message/disconnect?channelId={channelId}";
 
                 var response = await _httpClient.PostAsync(url, null);
                 return await HandleApiResponse(response);
@@ -211,7 +211,7 @@ namespace TravelAd_Api.Controllers
             try
             {
                 var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var url = $"{otherProjectBaseUrl}/Message/api/isAlive?channelId={channelId}";
+                var url = $"{otherProjectBaseUrl}/Message/isAlive?channelId={channelId}";
 
                 var response = await _httpClient.GetAsync(url);
                 return await HandleApiResponse(response);

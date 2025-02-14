@@ -575,7 +575,6 @@ D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\TravelAd_Api.staticwebassets.endpoints.json
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\staticwebassets.build.endpoints.json
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\staticwebassets\msbuild.TravelAd_Api.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\staticwebassets.upToDateCheck.txt
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\log4net.config
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\appsettings.Development.json
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\appsettings.json
@@ -669,6 +668,10 @@ D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\Tr
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\TravelAd_Api.pdb
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\TravelAd_Api.genruntimeconfig.cache
 D:\Projects\Travel Ad\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\ref\TravelAd_Api.dll
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\Inetlab.SMPP.dll
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\SmppLibrary.dll
-D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\SmppLibrary.pdb
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\Amazon.Extensions.S3.Encryption.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\AWSSDK.Core.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\AWSSDK.Extensions.NETCore.Setup.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\AWSSDK.KeyManagementService.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\AWSSDK.S3.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\CsvHelper.dll
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\bin\Release\net8.0\BouncyCastle.Crypto.dll

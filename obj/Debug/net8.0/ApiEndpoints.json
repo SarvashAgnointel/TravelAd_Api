@@ -592,6 +592,22 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "DeleteSMSPhoneNumber",
+    "RelativePath": "AdvertiserAccount/api/DeleteSMSPhoneNumber",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "DeleteTemplateById",
     "RelativePath": "AdvertiserAccount/api/DeleteTemplateById",
     "HttpMethod": "DELETE",
@@ -1713,6 +1729,22 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "InsertSMSPhoneNumber",
+    "RelativePath": "AdvertiserAccount/api/InsertSMSPhoneNumber",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "number",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BInsertSMSPhoneNumber",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "IsWhatsappTokenValid",
     "RelativePath": "AdvertiserAccount/api/IsWhatsappTokenValid",
     "HttpMethod": "GET",
@@ -1929,6 +1961,22 @@
       {
         "Name": "member",
         "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BPendingInvitedMembers",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "UpdateSMSPhoneNumber",
+    "RelativePath": "AdvertiserAccount/api/UpdateSMSPhoneNumber",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "number",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BUpdateSMSPhoneNumber",
         "IsRequired": true
       }
     ],

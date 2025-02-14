@@ -3244,6 +3244,90 @@
         }
       }
     },
+    "/AdvertiserAccount/api/InsertSMSPhoneNumber": {
+      "post": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertSMSPhoneNumber"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertSMSPhoneNumber"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InsertSMSPhoneNumber"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/UpdateSMSPhoneNumber": {
+      "put": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSMSPhoneNumber"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSMSPhoneNumber"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSMSPhoneNumber"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/DeleteSMSPhoneNumber": {
+      "delete": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/Authentication/api/UserLogin": {
       "post": {
         "tags": [
@@ -4621,6 +4705,24 @@
         },
         "additionalProperties": false
       },
+      "InsertSMSPhoneNumber": {
+        "type": "object",
+        "properties": {
+          "phoneName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "workspaceId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "InsertUserWorkspaceRole": {
         "type": "object",
         "properties": {
@@ -5117,6 +5219,24 @@
           "newPassword": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateSMSPhoneNumber": {
+        "type": "object",
+        "properties": {
+          "phoneName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

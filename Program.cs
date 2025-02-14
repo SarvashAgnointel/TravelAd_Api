@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add services to the container
 builder.Services.AddControllers();
-//builder.Services.AddScoped<IDbHandler, DbHandler>();
+builder.Services.AddScoped<IDbHandler, DbHandler>();
 builder.Services.AddMemoryCache();
 builder.Services.AddAuthorization();
 
@@ -124,15 +124,15 @@ builder.Services.AddSingleton<IDbHandler, DbHandler>();
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dialler = scope.ServiceProvider.GetRequiredService<Dialler>();
+using (var scope = app.Services.CreateScope())
+{
+    var dialler = scope.ServiceProvider.GetRequiredService<Dialler>();
 
-//    // Start the campaign processing task in the background
-//    var task = Task.Run(() => dialler.ProcessCampaignsAsync());
-//    // Optionally, you can wait for the task to complete (if you want)
-//    // await task;
-//}
+    // Start the campaign processing task in the background
+    var task = Task.Run(() => dialler.ProcessCampaignsAsync());
+    // Optionally, you can wait for the task to complete (if you want)
+    // await task;
+}
 
 app.UseHttpsRedirection();
 

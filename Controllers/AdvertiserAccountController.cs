@@ -329,111 +329,90 @@ namespace TravelAd_Api.Controllers
 
             try
             {
-                DataTable dtmain = new DataTable();
-                dtmain.Columns.Add("Status");
-                dtmain.Columns.Add("Status_Description");
-                dtmain.Columns.Add("campaign_id");
-
-                string insertQuery = "InsertCampaignDetails";
-                _logger.LogInformation("Executing stored procedure: {ProcedureName}", insertQuery);
+                _logger.LogInformation("Executing stored procedure: InsertCampaignDetails");
 
                 var parameters = new Dictionary<string, object>
-        {
-            {"campaign_name", cc.CampaignName },
-            {"campaign_budget", cc.CampaignBudget },
-            {"channel_type", cc.ChannelType },
-            {"target_country", cc.TargetCountry },
-            {"roaming_country", cc.RoamingCountry },
+     {
+         {"campaign_name", cc.CampaignName },
+         {"campaign_budget", cc.CampaignBudget },
+         {"channel_type", cc.ChannelType },
+         {"target_country", string.IsNullOrEmpty(cc.TargetCountry) || cc.TargetCountry == "[]" ? DBNull.Value.ToString() : cc.TargetCountry},
+         {"roaming_country", string.IsNullOrEmpty(cc.RoamingCountry) || cc.RoamingCountry == "[]" ? DBNull.Value.ToString() : cc.RoamingCountry},
+         {"start_date_time", cc.StartDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"end_date_time", cc.EndDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"status", cc.Status },
+         {"template_name", cc.TemplateName },
+         {"created_by", cc.CreatedBy },
+         {"created_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+         {"updated_by", cc.UpdatedBy },
+         {"updated_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+         {"workspace_id", cc.WorkspaceId },
+         {"List_id", cc.ListId },
+         {"device_id", cc.device_id },
+         {"delivered", cc.Delivered },
+         {"read_campaign", cc.ReadCampaign },
+         {"c_t_r", cc.CTR },
+         {"delivery_rate", cc.DeliveryRate },
+         {"button_click", cc.ButtonClick },
+         {"age", cc.Age },
+         {"gender", cc.Gender },
+         {"income_level", cc.IncomeLevel },
+         {"location", cc.Location },
+         {"interests", cc.Interests },
+         {"behaviours", cc.Behaviours },
+         {"os_device", cc.OSDevice },
+         {"f_campaign_budget", cc.FCampaignBudget },
+         {"f_start_date_time", cc.FStartDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"f_end_date_time", cc.FEndDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"is_admin_approved", cc.IsAdminApproved ?? (object)DBNull.Value },
+         {"is_operator_approved", cc.IsOperatorApproved ?? (object)DBNull.Value },
+         {"budget_and_schedule", cc.BudgetAndSchedule },
+         {"message_frequency", cc.MessageFrequency },
+         {"sequential_delivery", cc.SequentialDelivery },
+         {"prevent_duplicate_messages", cc.PreventDuplicateMessages },
+         {"daily_recipient_limit", cc.DailyRecipientLimit },
+         {"delivery_start_time", cc.DeliveryStartTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"delivery_end_time", cc.DeliveryEndTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
+         {"sms_number", string.IsNullOrEmpty(cc.sms_number) ? DBNull.Value.ToString() : cc.sms_number}
+     };
 
-            // Handle nullable DateTime fields
-            {"start_date_time", cc.StartDateTime.HasValue ? cc.StartDateTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value },
-            {"end_date_time", cc.EndDateTime.HasValue ? cc.EndDateTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value },
+                // Log parameters before execution
+                _logger.LogInformation($"Final Insert Query Parameters: {JsonConvert.SerializeObject(parameters)}");
 
-            {"status", cc.Status },
-            {"template_name", cc.TemplateName },
-            {"created_by", cc.CreatedBy },
-            {"created_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
-            {"updated_by", cc.UpdatedBy },
-            {"updated_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
+                int result = dbHandler.ExecuteNonQuery("InsertCampaignDetails", parameters, CommandType.StoredProcedure);
 
-            {"workspace_id", cc.WorkspaceId },
-            {"List_id", cc.ListId },
-            {"device_id", cc.device_id },
-            {"delivered", cc.Delivered },
-            {"read_campaign", cc.ReadCampaign },
-            {"c_t_r", cc.CTR },
-            {"delivery_rate", cc.DeliveryRate },
-            {"button_click", cc.ButtonClick },
-            {"age", cc.Age },
-            {"gender", cc.Gender },
-            {"income_level", cc.IncomeLevel },
-            {"location", cc.Location },
-            {"interests", cc.Interests },
-            {"behaviours", cc.Behaviours },
-            {"os_device", cc.OSDevice },
-            {"f_campaign_budget", cc.FCampaignBudget },
+                _logger.LogInformation($"Stored Procedure Execution Result: {result}");
 
-            {"f_start_date_time", cc.FStartDateTime.HasValue ? cc.FStartDateTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value },
-            {"f_end_date_time", cc.FEndDateTime.HasValue ? cc.FEndDateTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value },
-
-            // New Columns
-            
-            { "is_admin_approved", cc.IsAdminApproved ?? (object)DBNull.Value },
-{ "is_operator_approved", cc.IsOperatorApproved ?? (object)DBNull.Value },
-
-            {"budget_and_schedule", cc.BudgetAndSchedule },
-            {"message_frequency", cc.MessageFrequency },
-            {"sequential_delivery", cc.SequentialDelivery },
-            {"prevent_duplicate_messages", cc.PreventDuplicateMessages },
-            {"daily_recipient_limit", cc.DailyRecipientLimit },
-
-            {"delivery_start_time", cc.DeliveryStartTime.HasValue ? cc.DeliveryStartTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value },
-            {"delivery_end_time", cc.DeliveryEndTime.HasValue ? cc.DeliveryEndTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value }
-        };
-
-                // Logging for debugging
-                _logger.LogInformation("Start Date: {StartDateTime}, End Date: {EndDateTime}, FStartDateTime: {FStartDateTime}, FEndDateTime: {FEndDateTime}, DeliveryStartTime: {DeliveryStartTime}, DeliveryEndTime: {DeliveryEndTime}",
-                    cc.StartDateTime, cc.EndDateTime, cc.FStartDateTime, cc.FEndDateTime, cc.DeliveryStartTime, cc.DeliveryEndTime);
-
-                object result = dbHandler.ExecuteNonQuery(insertQuery, parameters, CommandType.StoredProcedure);
-
-                _logger.LogInformation($"Result: {result}");
-
-                if (result != null)
+                if (result > 0)
                 {
-                    _logger.LogInformation($"Campaign inserted with ID: {result}");
-                    response = new
+                    return new
                     {
                         Status = "Success",
-                        Status_Description = $"Campaign inserted with ID: {result}",
+                        Status_Description = $"Campaign inserted successfully.",
                         campaign_id = result
                     };
                 }
                 else
                 {
-                    _logger.LogWarning("Insertion failed.");
-                    response = new
+                    return new
                     {
                         Status = "Error",
-                        Status_Description = "Insertion failed.",
+                        Status_Description = "Failed to insert campaign.",
                         campaign_id = (object)null
                     };
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An exception occurred while processing the request: {ex.Message}");
-                response = new
+                _logger.LogError($"Exception: {ex.Message} | Stack Trace: {ex.StackTrace}");
+                return new
                 {
                     Status = "Error",
-                    Status_Description = $"An exception occurred while processing the request: {ex.Message}",
+                    Status_Description = $"Exception: {ex.Message}",
                     campaign_id = (object)null
                 };
             }
-
-            return response;
         }
-
 
         [HttpPut]
         public object UpdateCampaign(TravelAd_Api.Models.AdvertiserAccountModel.CreateCampaign cc, [FromServices] IDbHandler dbHandler)
@@ -2262,8 +2241,9 @@ namespace TravelAd_Api.Controllers
         }
 
 
+
         [HttpPost]
-        public async Task<IActionResult> CreateMessageTemplate([FromBody] MetaTemplateDetails meta, int workspaceId, int channel_id, int workspace_id, [FromServices] IDbHandler dbHandler)
+        public async Task<IActionResult> CreateMessageTemplate([FromBody] MetaTemplateDetails meta, int workspaceId, int channel_id, [FromServices] IDbHandler dbHandler)
         {
             var whatsappDetails = GetWhatsappAccountDetailsByWId(workspaceId);
             string url = $"{_configuration["facebookApiUrl"]}{whatsappDetails.WabaId}/message_templates";
@@ -2271,7 +2251,8 @@ namespace TravelAd_Api.Controllers
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", whatsappDetails.AccessToken);
-                var jsonString = meta.data2.ToString();
+                var jsonString = System.Text.Json.JsonSerializer.Serialize(meta.data2);
+
                 string mediaBase64 = meta.mediaBase64;
 
                 try
@@ -2348,20 +2329,20 @@ namespace TravelAd_Api.Controllers
 
                         // Execute the stored procedure to save the template details in the database
                         var parameters = new Dictionary<string, object>
-                {
-                    { "TemplateId", templateId },
-                    { "TemplateName", name },
-                    { "Language", language },
-                    { "Status", status },
-                    { "Category", category },
-                    { "SubCategory", subCategory ?? (object)DBNull.Value },
-                    { "Components", componentsElement },
-                    { "Channel_type",channel_id },
-                    { "Workspace_id",workspace_id },
-                    { "Last_updated",DateTime.Now},
-                    { "mediaBase64",mediaBase64},
-                    { "IsFirstEdit",true}
-                };
+              {
+                  { "TemplateId", templateId },
+                  { "TemplateName", name },
+                  { "Language", language },
+                  { "Status", status },
+                  { "Category", category },
+                  { "SubCategory", subCategory ?? (object)DBNull.Value },
+                  { "Components", componentsElement },
+                  { "Channel_type",channel_id },
+                  { "Workspace_id",workspaceId },
+                  { "Last_updated",DateTime.Now},
+                  { "mediaBase64",mediaBase64},
+                  { "IsFirstEdit",true}
+              };
 
                         string insertQuery = "InsertMetaTemplateDetails";
 
@@ -3355,12 +3336,12 @@ namespace TravelAd_Api.Controllers
         {
             try
             {
-                string deleteworkspaces = "deleteworkspce";
+                string deleteworkspaces = "DeleteWorkspaceByWorkSpaceId";
 
                 var Iparameters = new Dictionary<string, object>
- {
-     { "@workspaceinfoid", workspaceid }
- };
+{
+    { "@workspaceinfoid", workspaceid }
+};
 
                 DataTable deleteworkspaceids = dbHandler.ExecuteDataTable(deleteworkspaces, Iparameters, CommandType.StoredProcedure);
 
@@ -3374,14 +3355,13 @@ namespace TravelAd_Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(200, new
                 {
                     Status = "Error",
-                    Status_Description = $"An error occurred while retrieving the campaign list by id: {ex.Message}"
+                    Status_Description = $" {ex.Message}"
                 });
             }
         }
-
 
         [HttpGet]
         public IActionResult GetIndusryList([FromServices] IDbHandler dbHandler)
@@ -7452,7 +7432,7 @@ namespace TravelAd_Api.Controllers
 
             try
             {
-                string storedProcedure = "DeleteOperatorAccount";
+                string storedProcedure = "DeleteOperatorAccountByEmail";
                 _logger.LogInformation($"Executing stored procedure: {storedProcedure}");
 
                 // Parameters for the stored procedure
@@ -7496,6 +7476,7 @@ namespace TravelAd_Api.Controllers
             }
         }
 
+
         [HttpGet]
         public IActionResult GetSmsPhoneNumbers([FromServices] IDbHandler dbHandler, int workspace_id)
         {
@@ -7528,8 +7509,8 @@ namespace TravelAd_Api.Controllers
                     id = row.Field<int>("id"),
                     phone_name = row.Field<string>("phone_name"),
                     phone_number = row.Field<string>("phone_number"),
-                    created_date = row.Field<string>("created_date"),
-                    last_updated_date = row.Field<string>("last_updated_date")
+                    created_date = row.Field<DateTime>("created_date"),
+                    last_updated_date = row.Field<DateTime>("last_updated_date")
 
                 }).ToList();
 
@@ -7550,6 +7531,159 @@ namespace TravelAd_Api.Controllers
                     Status = "Error",
                     Status_Description = $"An error occurred while retrieving the Phone Numbers: {ex.Message}"
 
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult InsertSMSPhoneNumber([FromServices] IDbHandler dbHandler, [FromBody] InsertSMSPhoneNumber number)
+        {
+            try
+            {
+                string procedure = "InsertPhoneNumber";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", procedure);
+
+
+                var parameters = new Dictionary<string, object>
+        {
+            { "@phone_name", number.PhoneName},
+            { "@phone_number", number.PhoneNumber},
+                    {"@workspace_id", number.WorkspaceId },
+                    {"created_date",DateTime.Now },
+                    {"@last_updated",DateTime.Now }
+
+        };
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(procedure, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogInformation("could not insert phone number");
+                    return Ok(new
+                    {
+
+                        Status = "Failure",
+                        Status_Description = "could not insert phone number"
+                    });
+                }
+
+
+                _logger.LogInformation("phone number inserted successfully");
+                return Ok(new
+
+                {
+                    Status = "Success",
+                    Status_Description = "Phone number inserted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while inserting phone number: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while inserting phone number: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpPut]
+        public IActionResult UpdateSMSPhoneNumber([FromServices] IDbHandler dbHandler, [FromBody] UpdateSMSPhoneNumber number)
+        {
+            try
+            {
+                string procedure = "UpdateSMSNumber";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", procedure);
+
+
+                var parameters = new Dictionary<string, object>
+        {
+                    {"@id", number.Id },
+            { "@phone_name", number.PhoneName},
+            { "@phone_number", number.PhoneNumber},
+                    {"@last_updated",DateTime.Now }
+
+        };
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(procedure, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogInformation("could not update phone number");
+                    return Ok(new
+                    {
+
+                        Status = "Failure",
+                        Status_Description = "could not update phone number"
+                    });
+                }
+
+
+                _logger.LogInformation("phone number updated successfully");
+                return Ok(new
+
+                {
+                    Status = "Success",
+                    Status_Description = "Phone number updated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while updating phone number: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while updating phone number: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpDelete]
+        public IActionResult DeleteSMSPhoneNumber([FromServices] IDbHandler dbHandler, int id)
+        {
+            try
+            {
+                string procedure = "DeleteSMSNumber";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", procedure);
+
+
+                var parameters = new Dictionary<string, object>
+        {
+                    {"@id", id }
+
+        };
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(procedure, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogInformation("could not delete phone number");
+                    return Ok(new
+                    {
+
+                        Status = "Failure",
+                        Status_Description = "could not delete phone number"
+                    });
+                }
+
+
+                _logger.LogInformation("phone number deleted successfully");
+                return Ok(new
+
+                {
+                    Status = "Success",
+                    Status_Description = "Phone number deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while deleting phone number: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while deleting phone number: {ex.Message}"
                 });
             }
         }

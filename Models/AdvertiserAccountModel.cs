@@ -80,7 +80,7 @@ namespace TravelAd_Api.Models
             public DateTime? DeliveryStartTime { get; set; }
             public DateTime? DeliveryEndTime { get; set; }
 
-
+            public string sms_number { get; set; }
         }
 
         public class TemplateDetailsModel
@@ -111,17 +111,11 @@ namespace TravelAd_Api.Models
 
         }
 
+
         public class MetaTemplateDetails
         {
             public Data2 data2 { get; set; }
-
             public string? mediaBase64 { get; set; }
-        }
-
-        public class Component
-        {
-            public string type { get; set; } // This represents "BODY"
-            public string text { get; set; } // This represents the body text
         }
 
         public class Data2
@@ -130,7 +124,31 @@ namespace TravelAd_Api.Models
             public string category { get; set; }
             public bool allow_category_change { get; set; }
             public string language { get; set; }
-            public List<Component> components { get; set; }
+            public List<Component> components { get; set; } = new List<Component>(); // Corrected type
+        }
+
+        public class Component
+        {
+            public string type { get; set; }
+            public string? format { get; set; } // Only for HEADER
+            public string? text { get; set; } // For BODY & FOOTER
+            public Example? example { get; set; } // For HEADER (image, video, document) & BUTTONS
+            public List<Button>? buttons { get; set; } // For BUTTONS component
+        }
+
+        public class Example
+        {
+            public List<string>? header_handle { get; set; } // For media header
+            public List<string>? body_text { get; set; } // For example text in BODY
+        }
+
+        public class Button
+        {
+            public string type { get; set; } // URL, PHONE_NUMBER, COPY_CODE
+            public string text { get; set; } // Only for URL & PHONE_NUMBER
+            public string? url { get; set; } // Only for URL
+            public string? phone_number { get; set; } // Only for PHONE_NUMBER
+            public string? example { get; set; } // Only for COPY_CODE
         }
 
         public class SMSTemplateDetails
@@ -406,6 +424,21 @@ namespace TravelAd_Api.Models
             public DateTime UpdatedDate { get; set; }
         }
 
+        public class InsertSMSPhoneNumber
+        {
+            public string PhoneName { get; set; }
+                public string PhoneNumber { get; set; }
+            public int WorkspaceId { get; set; }
+
+        }
+        public class UpdateSMSPhoneNumber
+        {
+            public string PhoneName { get; set; }
+            public string PhoneNumber { get; set; }
+            public int Id { get; set; }
+
+        }
+        
 
     }
     }
