@@ -121,6 +121,7 @@ namespace TravelAd_Api.Controllers
                 {
                     workspaceId = row.Field<int>("workspace_id"),
                     workspaceName = row.Field<string>("workspace_name"),
+                    roleId = row.Field<int>("role_id"),
 
                 }).ToList();
 
@@ -142,6 +143,7 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
 
         [HttpGet]
         public IActionResult GetAudienceList([FromServices] IDbHandler dbHandler)
@@ -1088,6 +1090,52 @@ namespace TravelAd_Api.Controllers
                     Status = "Error",
                     Status_Description = "An error occurred while retrieving data",
                     ErrorMessage = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAdminAccess(int AdminId, [FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+                string deleteAdminAccess = "DeleteAdminAccess";
+
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", deleteAdminAccess);
+                var parameters = new Dictionary<string, object>
+        {
+            { "@AdminId", AdminId }
+        };
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(deleteAdminAccess, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogInformation("Admin not found or could not be deleted");
+                    return Ok(new
+                    {
+
+                        Status = "Failure",
+                        Status_Description = "Admin not found or could not be deleted"
+                    });
+                }
+
+
+                _logger.LogInformation("Admin Access deleted successfully");
+                return Ok(new
+
+                {
+                    Status = "Success",
+                    Status_Description = "Admin Access deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while deleting the admin Access: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while deleting the admin Access: {ex.Message}"
                 });
             }
         }

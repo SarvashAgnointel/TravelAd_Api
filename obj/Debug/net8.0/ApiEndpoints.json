@@ -1,6 +1,22 @@
 [
   {
     "ContainingType": "TravelAd_Api.Controllers.AdminController",
+    "Method": "DeleteAdminAccess",
+    "RelativePath": "Admin/api/DeleteAdminAccess",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "AdminId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdminController",
     "Method": "deleteworkspce",
     "RelativePath": "Admin/api/deleteworkspce",
     "HttpMethod": "GET",
@@ -383,11 +399,6 @@
       },
       {
         "Name": "channel_id",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "workspace_id",
         "Type": "System.Int32",
         "IsRequired": false
       }
