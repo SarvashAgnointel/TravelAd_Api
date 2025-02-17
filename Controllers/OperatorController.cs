@@ -336,15 +336,26 @@ namespace TravelAd_Api.Controllers
 
                 _logger.LogInformation("Chart details retrieved: {RowCount} rows.", chartDetails?.Rows.Count ?? 0);
 
-                var ChartData = chartDetails.AsEnumerable().Select(row => new
+                var ChartData = chartDetails != null && chartDetails.Rows.Count > 0
+                ? chartDetails.AsEnumerable().Select(row => new Dictionary<string, object>
                 {
-                    date = row.Field<DateTime>("date"),
-                    Email = row.Field<int?>("Email"),
-                    SMS = row.Field<int?>("SMS"),
-                    PushNotifications = row.Field<int?>("PushNotification"),
-                    RCSmessages = row.Field<int?>("RCSMessages"),
-                    WhatsApp = row.Field<int?>("WhatsApp")
-                }).ToList();
+                    { "date", row.Field<DateTime>("date") }, // Keep date unchanged
+                    { "email", row.Field<int?>("Email") ?? 0 }, // Convert Email → email (lowercase)
+                    { "sms", row.Field<int?>("SMS") ?? 0 }, // Convert SMS → sms
+                    { "pushNotifications", row.Field<int?>("PushNotification") ?? 0 }, // Convert PushNotifications → pushNotifications
+                    { "rcSmessages", row.Field<int?>("RCSMessages") ?? 0 }, // Convert RCSmessages → rcSmessages
+                    { "whatsApp", row.Field<int?>("WhatsApp") ?? 0 } // Convert WhatsApp → whatsApp
+                }).ToList()
+                : new List<Dictionary<string, object>> {
+                    new Dictionary<string, object> {
+                        { "date", DateTime.Now },
+                        { "email", 0 },  // Fixed Key Casing
+                        { "sms", 0 },
+                        { "pushNotifications", 0 },
+                        { "rcSmessages", 0 },
+                        { "whatsApp", 0 }
+                    }
+                };
 
                 _logger.LogInformation("Parsed chart details successfully. Data count: {Count}", ChartData.Count);
 
@@ -421,6 +432,189 @@ namespace TravelAd_Api.Controllers
                     Status_Description = $"An error occurred while retrieving the data: {ex.Message}"
                 });
             }
+        }
+
+        [HttpGet]
+        public IActionResult GetCampainListOperatorbyDateRange(DateTime from_date, DateTime to_date, int workspaceId, [FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+
+                string procedure = "GetCampainListOperatorbyDateRange";
+                _logger.LogInformation($"Executing stored procedure: {procedure}");
+
+                DateTime fromDate = from_date.Date;
+                DateTime toDate = to_date.Date;
+
+                // Prepare parameters for the stored procedure
+                var parameters = new Dictionary<string, object>
+               {
+
+                   { "@from_date", fromDate },
+                   { "@to_date", toDate },
+                   { "@workspaceId",workspaceId}
+               };
+
+                // Execute the stored procedure
+                DataTable campaignList = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
+
+                if (campaignList == null || campaignList.Rows.Count == 0)
+                {
+                    _logger.LogWarning("No campaigns found");
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No Campaigns found ",
+                        CampaignCount = 0 // Return zero count if no rows found
+                    });
+                }
+
+                // Transform the DataTable to a list of objects
+                var campaignListData = campaignList.AsEnumerable().Select(row => new
+                {
+                    campaign_id = row.Field<int>("campaign_id"),
+                    campaign_name = row.Field<string>("campaign_name"),
+                    channel_type = row.Field<string>("channel_type"),
+                    campaign_budget = row.Field<string>("campaign_budget"),
+                    start_date_time = row.Field<DateTime>("start_date_time"),
+                    end_date_time = row.Field<DateTime>("end_date_time"),
+                    status = row.Field<string>("status"),
+                    sent = row.Field<int?>("sent")
+                }).ToList();
+
+                _logger.LogInformation("Campaigns retrieved successfully. Data: {@CampaignListData}", campaignListData);
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Campaigns retrieved successfully",
+                    CampaignCount = campaignList.Rows.Count, // Add the row count here
+                    CampaignList = campaignListData
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving the campaign list.");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving the campaign list: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult GetOperatorContactsListByWorkspaceId([FromServices] IDbHandler dbHandler, int WorkspaceId)
+        {
+            try
+            {
+                string procedure = "GetOperatorContactsListByWorkspaceId"; // Stored procedure name
+
+
+                _logger.LogInformation($"Executing stored procedure: {procedure}");
+
+
+                var parameters = new Dictionary<string, object>
+        {
+            { "@WorkspaceId", WorkspaceId }
+        };
+
+                _logger.LogInformation("Stored procedure parameters: {Parameters}", parameters);
+
+                // Execute the stored procedure without parameters
+                DataTable contactList = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
+
+                if (contactList == null || contactList.Rows.Count == 0)
+                {
+                    _logger.LogWarning("No list found.");
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No list found",
+                        CampaignCount = 0 // Return zero count if no rows found
+                    });
+                }
+
+                // Transform the DataTable to a list of objects
+                var contactListData = contactList.AsEnumerable().Select(row => new
+                {
+
+                    file_name = row.Field<string>("fileName"),
+                    status = row.Field<string>("status"),
+                    update_at = row.Field<DateTime>("updated_date"),
+                    recipient = row.Field<int>("ContactCount"),
+                    list_id = row.Field<int>("list_id"),
+                    type = row.Field<string>("createdby")
+                }).ToList();
+
+                _logger.LogInformation("Contact lisr retrieved successfully. Data: {@CampaignListData}", contactListData);
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Contact list retrieved successfully",
+                    contactListCount = contactList.Rows.Count, // Add the row count here
+                    ContactList = contactListData
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving the contact list.");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving the contact list: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetOperatorProfileImage([FromServices] IDbHandler dbHandler, string EmailId)
+        {
+            try
+            {
+                string procedure = "GetOperatorProfileImage";
+
+                var parameters = new Dictionary<string, object>
+        {
+            { "@EmailId", EmailId },
+        };
+
+
+                DataTable ImageDetails = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
+
+                if (ImageDetails.Rows.Count == 0)
+                {
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "Image Not found"
+                    });
+                }
+
+                var ImageData = ImageDetails.AsEnumerable().Select(row => new
+                {
+
+                    image = row.Field<string>("image"),
+                }).ToList();
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Image retrieved successfully",
+                    Image = ImageData
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving the image: {ex.Message}"
+                });
+            }
+
         }
 
     }

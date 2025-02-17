@@ -244,6 +244,16 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdminController",
+    "Method": "GetWhatsappNumbers",
+    "RelativePath": "Admin/api/GetWhatsappNumbers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdminController",
     "Method": "GetWorkspaceCount",
     "RelativePath": "Admin/api/GetWorkspaceCount",
     "HttpMethod": "GET",
@@ -307,6 +317,22 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "ChangeStatusToggle",
+    "RelativePath": "AdvertiserAccount/api/ChangeStatusToggle",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BStatusToggleRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "CheckEditPermission",
     "RelativePath": "AdvertiserAccount/api/CheckEditPermission",
     "HttpMethod": "GET",
@@ -356,7 +382,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "cc",
+        "Name": "request",
         "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BCreateCampaign",
         "IsRequired": true
       }
@@ -1756,6 +1782,32 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "insertworkspacebillstatus",
+    "RelativePath": "AdvertiserAccount/api/insertworkspacebillstatus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "personalid",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "workspacename",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "workspaceid",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "IsWhatsappTokenValid",
     "RelativePath": "AdvertiserAccount/api/IsWhatsappTokenValid",
     "HttpMethod": "GET",
@@ -1864,7 +1916,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "cc",
+        "Name": "request",
         "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BCreateCampaign",
         "IsRequired": true
       }
@@ -2616,6 +2668,32 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.OperatorController",
+    "Method": "GetCampainListOperatorbyDateRange",
+    "RelativePath": "Operator/api/GetCampainListOperatorbyDateRange",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "from_date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "to_date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "workspaceId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.OperatorController",
     "Method": "GetCombinedStatisticsOperator",
     "RelativePath": "Operator/api/GetCombinedStatisticsOperator",
     "HttpMethod": "GET",
@@ -2672,6 +2750,38 @@
       {
         "Name": "to_date",
         "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.OperatorController",
+    "Method": "GetOperatorContactsListByWorkspaceId",
+    "RelativePath": "Operator/api/GetOperatorContactsListByWorkspaceId",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "WorkspaceId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.OperatorController",
+    "Method": "GetOperatorProfileImage",
+    "RelativePath": "Operator/api/GetOperatorProfileImage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "EmailId",
+        "Type": "System.String",
         "IsRequired": false
       }
     ],

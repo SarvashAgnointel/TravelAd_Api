@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelAd_Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+97e7c2adc9366edbdb6a3d10946914dc6a73a2ac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f94db8ce7a996ec8752493c537c839c4d18568d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelAd_Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelAd_Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

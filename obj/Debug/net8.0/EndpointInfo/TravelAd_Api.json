@@ -423,6 +423,18 @@
         }
       }
     },
+    "/Admin/api/GetWhatsappNumbers": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/AdvertiserAccount/api/GetChannelList": {
       "get": {
         "tags": [
@@ -839,37 +851,6 @@
         "tags": [
           "AdvertiserAccount"
         ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/AdvertiserAccount/api/GetPersonalinfoByEmail": {
-      "post": {
-        "tags": [
-          "AdvertiserAccount"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Success"
@@ -3342,6 +3323,104 @@
         }
       }
     },
+    "/AdvertiserAccount/api/GetPersonalinfoByEmail": {
+      "post": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPersonalinfoByEmail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/ChangeStatusToggle": {
+      "post": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusToggleRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusToggleRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusToggleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/insertworkspacebillstatus": {
+      "post": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "parameters": [
+          {
+            "name": "personalid",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "workspacename",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspaceid",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/Authentication/api/UserLogin": {
       "post": {
         "tags": [
@@ -4092,6 +4171,87 @@
         }
       }
     },
+    "/Operator/api/GetCampainListOperatorbyDateRange": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "parameters": [
+          {
+            "name": "from_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Operator/api/GetOperatorContactsListByWorkspaceId": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "parameters": [
+          {
+            "name": "WorkspaceId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/Operator/api/GetOperatorProfileImage": {
+      "get": {
+        "tags": [
+          "Operator"
+        ],
+        "parameters": [
+          {
+            "name": "EmailId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/Sms/api/getchannels": {
       "get": {
         "tags": [
@@ -4529,19 +4689,13 @@
           },
           "listId": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
-          "workspace_id": {
+          "deviceId": {
             "type": "integer",
-            "format": "int32"
-          },
-          "list_id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "device_id": {
-            "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "delivered": {
             "type": "string",
@@ -4565,31 +4719,38 @@
           },
           "age": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "gender": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "incomeLevel": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "location": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "interests": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "behaviours": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "osDevice": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "fCampaignBudget": {
             "type": "string",
@@ -4644,7 +4805,7 @@
             "format": "date-time",
             "nullable": true
           },
-          "sms_number": {
+          "smsNumber": {
             "type": "string",
             "nullable": true
           }
@@ -5111,6 +5272,20 @@
           "channelId": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StatusToggleRequest": {
+        "type": "object",
+        "properties": {
+          "billingId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

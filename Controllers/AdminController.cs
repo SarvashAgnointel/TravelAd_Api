@@ -812,6 +812,7 @@ namespace TravelAd_Api.Controllers
             }
         }
 
+
         [HttpGet]
         public IActionResult GetAdminDashboardChartDetailsByDateRange([FromServices] IDbHandler dbHandler, DateTime from_date, DateTime to_date)
         {
@@ -825,33 +826,45 @@ namespace TravelAd_Api.Controllers
                 DateTime toDate = to_date.Date;
 
                 var parameters = new Dictionary<string, object>
-                {
-                    { "@from_date", fromDate },
-                    { "@to_date", toDate }
-                };
+        {
+            { "@from_date", fromDate },
+            { "@to_date", toDate }
+        };
 
                 DataTable DataList = dbHandler.ExecuteDataTable(getChartDetailsList, parameters, CommandType.StoredProcedure);
 
-                if (DataList == null || DataList.Rows.Count == 0)
-                {
-                    _logger.LogInformation("No details for chart found");
+                //if (DataList == null || DataList.Rows.Count == 0)
+                //{
+                //    _logger.LogInformation("No details for chart found");
 
-                    return Ok(new
-                    {
-                        Status = "Failure",
-                        Status_Description = "No details for chart found"
-                    });
-                }
+                //    return Ok(new
+                //    {
+                //        Status = "Failure",
+                //        Status_Description = "No details for chart found"
+                //    });
+                //}
 
-                var ChartListData = DataList.AsEnumerable().Select(row => new
+                var ChartListData = DataList != null && DataList.Rows.Count > 0
+                ? DataList.AsEnumerable().Select(row => new Dictionary<string, object>
                 {
-                    date = row.Field<DateTime>("date"),
-                    Email = row.Field<int?>("Email"),
-                    SMS = row.Field<int?>("SMS"),
-                    PushNotifications = row.Field<int?>("PushNotification"),
-                    RCSmessages = row.Field<int?>("RCSMessages"),
-                    WhatsApp = row.Field<int?>("WhatsApp")
-                }).ToList();
+            { "date", row.Field<DateTime>("date") }, // Keep date unchanged
+            { "email", row.Field<int?>("Email") ?? 0 }, // Convert Email → email (lowercase)
+            { "sms", row.Field<int?>("SMS") ?? 0 }, // Convert SMS → sms
+            { "pushNotifications", row.Field<int?>("PushNotification") ?? 0 }, // Convert PushNotifications → pushNotifications
+            { "rcSmessages", row.Field<int?>("RCSMessages") ?? 0 }, // Convert RCSmessages → rcSmessages
+            { "whatsApp", row.Field<int?>("WhatsApp") ?? 0 } // Convert WhatsApp → whatsApp
+                }).ToList()
+                : new List<Dictionary<string, object>> {
+            new Dictionary<string, object> {
+                { "date", DateTime.Now },
+                { "email", 0 },
+                { "sms", 0 },
+                { "pushNotifications", 0 },
+                { "rcSmessages", 0 },
+                { "whatsApp", 0 }
+            }
+                };
+
 
                 _logger.LogInformation("Chart Details retrieved successfully");
                 _logger.LogInformation("Requests: {@ChartListData}", ChartListData);
@@ -874,6 +887,7 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
 
         [HttpPut]
         public IActionResult UpdateCampaignStatus(TravelAd_Api.Models.AdminModel.UpdateCampaign uc, [FromServices] IDbHandler dbHandler)
@@ -1139,6 +1153,66 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public IActionResult GetWhatsappNumbers([FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+                string procedure = "GetWhatsappPhoneNumbers";
+
+                var parameters = new Dictionary<string, object>
+                {
+                };
+
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", procedure);
+
+                DataTable PhoneNumberList = dbHandler.ExecuteDataTable(procedure,parameters,CommandType.StoredProcedure);
+
+                if (PhoneNumberList == null || PhoneNumberList.Rows.Count == 0)
+                {
+                    _logger.LogInformation("No phone numbers found");
+
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No whatsapp phone number found"
+                    });
+                }
+
+                var PhoneNumberListData = PhoneNumberList.AsEnumerable().Select(row => new
+                {
+                    id = row.Field<int>("id"),
+                    workspaceName = row.Field<string>("workspace_name"),
+                    wabaId = row.Field<string>("wabaId"),
+                    phoneId = row.Field<string>("phoneId"),
+                    created_date = row.Field<DateTime?>("createdDate"),
+                    last_updated = row.Field<DateTime?>("lastUpdated"),
+                }).ToList();
+
+                _logger.LogInformation("Phone number list data retrieved successfully");
+                _logger.LogInformation("Requests: {@AccountListData}", PhoneNumberListData);
+
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "phone number list retrieved successfully",
+                    PhoneNumberData = PhoneNumberListData
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while retrieving the account list: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving the whatsapp number list: {ex.Message}"
+                });
+            }
+        }
+
+
 
     }
 }

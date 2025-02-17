@@ -69,6 +69,7 @@ builder.Services.AddCors(options =>
                           .AllowCredentials());
 });
 
+
 // Configure Swagger (API documentation)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

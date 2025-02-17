@@ -318,7 +318,7 @@ namespace TravelAd_Api.Controllers
 
 
         [HttpPost]
-        public object CreateCampaign(TravelAd_Api.Models.AdvertiserAccountModel.CreateCampaign cc, [FromServices] IDbHandler dbHandler)
+        public object CreateCampaign(TravelAd_Api.Models.AdvertiserAccountModel.CreateCampaign request, [FromServices] IDbHandler dbHandler)
         {
             var response = new
             {
@@ -329,98 +329,78 @@ namespace TravelAd_Api.Controllers
 
             try
             {
-                _logger.LogInformation("Executing stored procedure: InsertCampaignDetails");
+                string insertQuery = "InsertCampaignDetails";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", insertQuery);
+
+                // Ensure proper JSON string format
+                string targetCountry = string.IsNullOrWhiteSpace(request.TargetCountry) ? "[]" : request.TargetCountry;
+                string roamingCountry = string.IsNullOrWhiteSpace(request.RoamingCountry) ? "[]" : request.RoamingCountry;
 
                 var parameters = new Dictionary<string, object>
-     {
-         {"campaign_name", cc.CampaignName },
-         {"campaign_budget", cc.CampaignBudget },
-         {"channel_type", cc.ChannelType },
-         {"target_country", string.IsNullOrEmpty(cc.TargetCountry) || cc.TargetCountry == "[]" ? DBNull.Value.ToString() : cc.TargetCountry},
-         {"roaming_country", string.IsNullOrEmpty(cc.RoamingCountry) || cc.RoamingCountry == "[]" ? DBNull.Value.ToString() : cc.RoamingCountry},
-         {"start_date_time", cc.StartDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"end_date_time", cc.EndDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"status", cc.Status },
-         {"template_name", cc.TemplateName },
-         {"created_by", cc.CreatedBy },
-         {"created_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
-         {"updated_by", cc.UpdatedBy },
-         {"updated_date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") },
-         {"workspace_id", cc.WorkspaceId },
-         {"List_id", cc.ListId },
-         {"device_id", cc.device_id },
-         {"delivered", cc.Delivered },
-         {"read_campaign", cc.ReadCampaign },
-         {"c_t_r", cc.CTR },
-         {"delivery_rate", cc.DeliveryRate },
-         {"button_click", cc.ButtonClick },
-         {"age", cc.Age },
-         {"gender", cc.Gender },
-         {"income_level", cc.IncomeLevel },
-         {"location", cc.Location },
-         {"interests", cc.Interests },
-         {"behaviours", cc.Behaviours },
-         {"os_device", cc.OSDevice },
-         {"f_campaign_budget", cc.FCampaignBudget },
-         {"f_start_date_time", cc.FStartDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"f_end_date_time", cc.FEndDateTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"is_admin_approved", cc.IsAdminApproved ?? (object)DBNull.Value },
-         {"is_operator_approved", cc.IsOperatorApproved ?? (object)DBNull.Value },
-         {"budget_and_schedule", cc.BudgetAndSchedule },
-         {"message_frequency", cc.MessageFrequency },
-         {"sequential_delivery", cc.SequentialDelivery },
-         {"prevent_duplicate_messages", cc.PreventDuplicateMessages },
-         {"daily_recipient_limit", cc.DailyRecipientLimit },
-         {"delivery_start_time", cc.DeliveryStartTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"delivery_end_time", cc.DeliveryEndTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? (object)DBNull.Value },
-         {"sms_number", string.IsNullOrEmpty(cc.sms_number) ? DBNull.Value.ToString() : cc.sms_number}
-     };
+        {
+            { "@campaign_name", request.CampaignName },
+            { "@campaign_budget", request.CampaignBudget ?? (object)DBNull.Value },
+            { "@channel_type", request.ChannelType },
+            { "@target_country", targetCountry },
+            { "@roaming_country", roamingCountry },
+            { "@start_date_time", request.StartDateTime ?? (object)DBNull.Value },
+            { "@end_date_time", request.EndDateTime ?? (object)DBNull.Value },
+            { "@status", request.Status ?? (object)DBNull.Value },
+            { "@template_name", request.TemplateName ?? (object)DBNull.Value },
+            { "@created_by", request.CreatedBy },
+            { "@created_date", request.CreatedDate ?? DateTime.UtcNow },
+            { "@updated_by", request.UpdatedBy },
+            { "@updated_date", request.UpdatedDate ?? DateTime.UtcNow },
+            { "@workspace_id", request.WorkspaceId },
+            { "@list_id", request.ListId ?? (object)DBNull.Value },
+            { "@device_id", request.DeviceId ?? (object)DBNull.Value },
+            { "@delivered", request.Delivered ?? (object)DBNull.Value },
+            { "@read_campaign", request.ReadCampaign ?? (object)DBNull.Value },
+            { "@c_t_r", request.CTR ?? (object)DBNull.Value },
+            { "@delivery_rate", request.DeliveryRate ?? (object)DBNull.Value },
+            { "@button_click", request.ButtonClick ?? (object)DBNull.Value },
+            { "@age", request.Age ?? (object)DBNull.Value },
+            { "@gender", request.Gender ?? (object)DBNull.Value },
+            { "@income_level", request.IncomeLevel ?? (object)DBNull.Value },
+            { "@location", request.Location ?? (object)DBNull.Value },
+            { "@interests", request.Interests ?? (object)DBNull.Value },
+            { "@behaviours", request.Behaviours ?? (object)DBNull.Value },
+            { "@os_device", request.OSDevice ?? (object)DBNull.Value },
+            { "@f_campaign_budget", request.FCampaignBudget ?? (object)DBNull.Value },
+            { "@f_start_date_time", request.FStartDateTime ?? (object)DBNull.Value },
+            { "@f_end_date_time", request.FEndDateTime ?? (object)DBNull.Value },
+            { "@is_admin_approved", request.IsAdminApproved ?? (object)DBNull.Value },
+            { "@is_operator_approved", request.IsOperatorApproved ?? (object)DBNull.Value },
+            { "@budget_and_schedule", request.BudgetAndSchedule ?? (object)DBNull.Value },
+            { "@message_frequency", request.MessageFrequency ?? (object)DBNull.Value },
+            { "@sequential_delivery", request.SequentialDelivery ?? (object)DBNull.Value },
+            { "@prevent_duplicate_messages", request.PreventDuplicateMessages ?? (object)DBNull.Value },
+            { "@daily_recipient_limit", request.DailyRecipientLimit ?? (object)DBNull.Value },
+            { "@delivery_start_time", request.DeliveryStartTime ?? (object)DBNull.Value },
+            { "@delivery_end_time", request.DeliveryEndTime ?? (object)DBNull.Value },
+            { "@sms_number", request.SmsNumber ?? (object)DBNull.Value }
+        };
 
-                // Log parameters before execution
-                _logger.LogInformation($"Final Insert Query Parameters: {JsonConvert.SerializeObject(parameters)}");
+                object result = dbHandler.ExecuteScalar(insertQuery, parameters, CommandType.StoredProcedure);
 
-                int result = dbHandler.ExecuteNonQuery("InsertCampaignDetails", parameters, CommandType.StoredProcedure);
-
-                _logger.LogInformation($"Stored Procedure Execution Result: {result}");
-
-                if (result > 0)
-                {
-                    return new
-                    {
-                        Status = "Success",
-                        Status_Description = $"Campaign inserted successfully.",
-                        campaign_id = result
-                    };
-                }
-                else
-                {
-                    return new
-                    {
-                        Status = "Error",
-                        Status_Description = "Failed to insert campaign.",
-                        campaign_id = (object)null
-                    };
-                }
+                response = new { Status = "Success", Status_Description = "Campaign inserted", campaign_id = result };
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Exception: {ex.Message} | Stack Trace: {ex.StackTrace}");
-                return new
-                {
-                    Status = "Error",
-                    Status_Description = $"Exception: {ex.Message}",
-                    campaign_id = (object)null
-                };
+                _logger.LogError($"Error: {ex.Message}");
             }
+
+            return response;
         }
 
+
         [HttpPut]
-        public object UpdateCampaign(TravelAd_Api.Models.AdvertiserAccountModel.CreateCampaign cc, [FromServices] IDbHandler dbHandler)
+        public object UpdateCampaign(TravelAd_Api.Models.AdvertiserAccountModel.CreateCampaign request, [FromServices] IDbHandler dbHandler)
         {
             var response = new
             {
                 Status = "Error",
-                Status_Description = "An error occurred."
+                Status_Description = "An error occurred while updating the template."
             };
 
             try
@@ -430,84 +410,89 @@ namespace TravelAd_Api.Controllers
                 dtmain.Columns.Add("Status_Description");
 
                 string updateQuery = "UpdateCampaignDetails";
-                _logger.LogInformation("Executing stored procedure:", updateQuery);
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", updateQuery);
 
                 var parameters = new Dictionary<string, object>
-  {
-      {"@CampaignId", cc.CampaignId },
-      {"@CampaignName", cc.CampaignName },
-      {"@CampaignBudget", cc.CampaignBudget },
-      {"@ChannelType", cc.ChannelType },
-      {"@TargetCountry", cc.TargetCountry },
-      {"@RoamingCountry", cc.RoamingCountry },
-      {"@StartDateTime", cc.StartDateTime.HasValue ? cc.StartDateTime.Value : (object)DBNull.Value },
-      {"@EndDateTime", cc.EndDateTime.HasValue ? cc.EndDateTime.Value : (object)DBNull.Value },
-      {"@Status", cc.Status },
-      {"@TemplateName", cc.TemplateName },
-      {"@UpdatedBy", cc.UpdatedBy },
-      {"@UpdateDate", DateTime.Now },
-      {"@DeviceId", cc.device_id },
-      {"@Delivered", cc.Delivered },
-      {"@ReadCampaign", cc.ReadCampaign },
-      {"@CTR", cc.CTR },
-      {"@DeliveryRate", cc.DeliveryRate },
-      {"@ButtonClick", cc.ButtonClick },
-      {"@Age", cc.Age },
-      {"@Gender", cc.Gender },
-      {"@IncomeLevel", cc.IncomeLevel },
-      {"@Location", cc.Location },
-      {"@Interests", cc.Interests },
-      {"@Behaviours", cc.Behaviours },
-      {"@OsDevice", cc.OSDevice },
-      {"@FCampaignBudget", cc.FCampaignBudget },
-      {"@FStartDateTime", cc.FStartDateTime.HasValue ? cc.FStartDateTime.Value : (object)DBNull.Value },
-      {"@FEndDateTime", cc.FEndDateTime.HasValue ? cc.FEndDateTime.Value : (object)DBNull.Value },
-      {"@IsAdminApproved", cc.IsAdminApproved ?? (object)DBNull.Value },
-      {"@IsOperatorApproved", cc.IsOperatorApproved ?? (object)DBNull.Value },
-      {"@BudgetAndSchedule", cc.BudgetAndSchedule },
-      {"@MessageFrequency", cc.MessageFrequency },
-      {"@SequentialDelivery", cc.SequentialDelivery },
-      {"@PreventDuplicateMessages", cc.PreventDuplicateMessages },
-      {"@DailyRecipientLimit", cc.DailyRecipientLimit },
-      {"@DeliveryStartTime", cc.DeliveryStartTime.HasValue ? cc.DeliveryStartTime.Value : (object)DBNull.Value },
-      {"@DeliveryEndTime", cc.DeliveryEndTime.HasValue ? cc.DeliveryEndTime.Value : (object)DBNull.Value }
-  };
+     {
+            {"@CampaignId", request.CampaignId },
+            {"@CampaignName", request.CampaignName },
+            {"@CampaignBudget", request.CampaignBudget ?? (object)DBNull.Value },
+            {"@ChannelType", request.ChannelType },
+            {"@TargetCountry", request.TargetCountry ?? (object)DBNull.Value },
+            {"@RoamingCountry", request.RoamingCountry ?? (object)DBNull.Value },
+            {"@StartDateTime", request.StartDateTime ?? (object)DBNull.Value },
+            {"@EndDateTime", request.EndDateTime ?? (object)DBNull.Value },
+            {"@Status", request.Status ?? (object)DBNull.Value },
+            {"@TemplateName", request.TemplateName ?? (object)DBNull.Value },
+            {"@UpdatedBy", request.UpdatedBy },
+            {"@UpdateDate", DateTime.UtcNow },
+            {"@WorkspaceId", request.WorkspaceId },
+            {"@ListId", request.ListId ?? (object)DBNull.Value },
+            {"@DeviceId", request.DeviceId ?? (object)DBNull.Value },
+            {"@Delivered", request.Delivered ?? (object)DBNull.Value },
+            {"@ReadCampaign", request.ReadCampaign ?? (object)DBNull.Value },
+            {"@CTR", request.CTR ?? (object)DBNull.Value },
+            {"@DeliveryRate", request.DeliveryRate ?? (object)DBNull.Value },
+            {"@ButtonClick", request.ButtonClick ?? (object)DBNull.Value },
+            {"@Age", request.Age ?? (object)DBNull.Value },
+            {"@Gender", request.Gender ?? (object)DBNull.Value },
+            {"@IncomeLevel", request.IncomeLevel ?? (object)DBNull.Value },
+            {"@Location", request.Location ?? (object)DBNull.Value },
+            {"@Interests", request.Interests ?? (object)DBNull.Value },
+            {"@Behaviours", request.Behaviours ?? (object)DBNull.Value },
+            {"@OsDevice", request.OSDevice ?? (object)DBNull.Value },
+            {"@FCampaignBudget", request.FCampaignBudget ?? (object)DBNull.Value },
+            {"@FStartDateTime", request.FStartDateTime ?? (object)DBNull.Value },
+            {"@FEndDateTime", request.FEndDateTime ?? (object)DBNull.Value },
+            {"@IsAdminApproved", request.IsAdminApproved ?? (object)DBNull.Value },
+            {"@IsOperatorApproved", request.IsOperatorApproved ?? (object)DBNull.Value },
+            {"@BudgetAndSchedule", request.BudgetAndSchedule ?? (object)DBNull.Value },
+            {"@MessageFrequency", request.MessageFrequency ?? (object)DBNull.Value },
+            {"@SequentialDelivery", request.SequentialDelivery ?? (object)DBNull.Value },
+            {"@PreventDuplicateMessages", request.PreventDuplicateMessages ?? (object)DBNull.Value },
+            {"@DailyRecipientLimit", request.DailyRecipientLimit ?? (object)DBNull.Value },
+            {"@DeliveryStartTime", request.DeliveryStartTime ?? (object)DBNull.Value },
+            {"@DeliveryEndTime", request.DeliveryEndTime ?? (object)DBNull.Value },
+            {"@SmsNumber", request.SmsNumber ?? (object)DBNull.Value }
+        };
 
-                int result = (int)dbHandler.ExecuteNonQuery(updateQuery, parameters, CommandType.StoredProcedure);
 
-                if (result == 1)
+
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(updateQuery, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected > 0)
                 {
-                    _logger.LogInformation($"Campaign with ID: {cc.CampaignId} was updated successfully.");
+                    _logger.LogInformation("Campaign updated successfully.");
                     response = new
                     {
                         Status = "Success",
-                        Status_Description = $"Campaign with ID: {cc.CampaignId} was updated successfully."
+                        Status_Description = $"Campaign updated successfully."
                     };
                 }
-                else if (result == -1)
+                else
                 {
-                    _logger.LogWarning("Campaign ID not found. Update failed.");
+                    _logger.LogError("Update failed. No records were updated.");
                     response = new
                     {
                         Status = "Error",
-                        Status_Description = "Campaign ID not found. Update failed."
+                        Status_Description = "Update failed. No records were updated."
                     };
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An exception occurred while processing the request. Error: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
+                _logger.LogError($"An exception occurred while processing the request: {ex.Message}");
                 response = new
                 {
                     Status = "Error",
-                    Status_Description = "An exception occurred while processing the request."
+                    Status_Description = $"An exception occurred while processing the request: {ex.Message}"
                 };
             }
 
             return response;
         }
-
-
 
         [HttpGet]
         public IActionResult GetTemplateDetails([FromServices] IDbHandler dbHandler)
@@ -1315,67 +1300,6 @@ namespace TravelAd_Api.Controllers
                 {
                     Status = "Error",
                     Status_Description = $"An error occurred while retrieving the roles list: {ex.Message}"
-                });
-            }
-        }
-
-
-        [HttpPost]
-        public IActionResult GetPersonalinfoByEmail([FromBody] GetPersonalinfoByEmail request, [FromServices] IDbHandler dbHandler)
-        {
-            try
-            {
-                string storedProcedure = "GetPersonalinfo";
-                _logger.LogInformation("Executing stored procedure: {ProcedureName}", storedProcedure);
-
-                var parameters = new Dictionary<string, object>
-{
-    { "@user_email", request.UserEmail }
-};
-
-                _logger.LogInformation("Stored procedure parameters: {Parameters}", parameters);
-
-                // Execute the stored procedure
-                DataTable resultTable = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
-
-                if (resultTable.Rows.Count == 0)
-                {
-                    _logger.LogInformation("No personal info found for the provided email: {UserEmail}", request.UserEmail);
-
-                    return Ok(new
-                    {
-                        Status = "Failure",
-                        Status_Description = "No personal info found for the given email ID."
-                    });
-                }
-
-                // Map the DataTable rows to a list of strongly-typed objects
-                var personalInfoList = resultTable.AsEnumerable().Select(row => new
-                {
-                    FirstName = row.Field<string>("first_name"),
-                    LastName = row.Field<string>("last_name"),
-                    Email = row.Field<string>("email"),
-                    UserPersonalId = row.Field<int>("user_personal_id")
-                }).ToList();
-
-                _logger.LogInformation("Personal info retrieved successfully: {PersonalInfoList}", personalInfoList);
-
-                return Ok(new
-                {
-                    Status = "Success",
-                    Status_Description = "Personal info retrieved successfully.",
-                    PersonalInfoList = personalInfoList
-                });
-            }
-            catch (Exception ex)
-            {
-
-                _logger.LogError(ex, "An error occurred while retrieving personal info for email: {UserEmail}", request.UserEmail);
-
-                return StatusCode(500, new
-                {
-                    Status = "Error",
-                    Status_Description = $"An error occurred while retrieving personal info: {ex.Message}"
                 });
             }
         }
@@ -3497,24 +3421,35 @@ namespace TravelAd_Api.Controllers
                 DateTime toDate = to_date.Date;
 
                 var parameters = new Dictionary<string, object>
-                {
-                    { "@WorkspaceId", workspaceId },
-                    { "@from_date", fromDate },
-                    { "@to_date", toDate }
-                };
+        {
+            { "@WorkspaceId", workspaceId },
+            { "@from_date", fromDate },
+            { "@to_date", toDate }
+        };
                 chartDetails = dbHandler.ExecuteDataTable(procedure1, parameters, CommandType.StoredProcedure);
 
                 _logger.LogInformation("Chart details retrieved: {RowCount} rows.", chartDetails?.Rows.Count ?? 0);
 
-                var ChartData = chartDetails.AsEnumerable().Select(row => new
+                var ChartData = chartDetails != null && chartDetails.Rows.Count > 0
+                ? chartDetails.AsEnumerable().Select(row => new Dictionary<string, object>
                 {
-                    date = row.Field<DateTime>("date"),
-                    Email = row.Field<int?>("Email"),
-                    SMS = row.Field<int?>("SMS"),
-                    PushNotifications = row.Field<int?>("PushNotification"),
-                    RCSmessages = row.Field<int?>("RCSMessages"),
-                    WhatsApp = row.Field<int?>("WhatsApp")
-                }).ToList();
+            { "date", row.Field<DateTime>("date") }, // Keep date unchanged
+            { "email", row.Field<int?>("Email") ?? 0 }, // Convert Email → email (lowercase)
+            { "sms", row.Field<int?>("SMS") ?? 0 }, // Convert SMS → sms
+            { "pushNotifications", row.Field<int?>("PushNotification") ?? 0 }, // Convert PushNotifications → pushNotifications
+            { "rcSmessages", row.Field<int?>("RCSMessages") ?? 0 }, // Convert RCSmessages → rcSmessages
+            { "whatsApp", row.Field<int?>("WhatsApp") ?? 0 } // Convert WhatsApp → whatsApp
+                }).ToList()
+                : new List<Dictionary<string, object>> {
+            new Dictionary<string, object> {
+                { "date", DateTime.Now },
+                { "email", 0 },  // Fixed Key Casing
+                { "sms", 0 },
+                { "pushNotifications", 0 },
+                { "rcSmessages", 0 },
+                { "whatsApp", 0 }
+            }
+                };
 
                 _logger.LogInformation("Parsed chart details successfully. Data count: {Count}", ChartData.Count);
 
@@ -3522,10 +3457,10 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure2: ", procedure2);
 
                 var parameters2 = new Dictionary<string, object>{
-                    { "@WorkspaceId", workspaceId },
-                    { "@from_date", fromDate },
-                    { "@to_date", toDate }
-                };
+            { "@WorkspaceId", workspaceId },
+            { "@from_date", fromDate },
+            { "@to_date", toDate }
+        };
                 campaignDetails = dbHandler.ExecuteDataTable(procedure2, parameters2, CommandType.StoredProcedure);
 
                 _logger.LogInformation("Campaign details retrieved: {RowCount} rows.", campaignDetails?.Rows.Count ?? 0);
@@ -3539,10 +3474,10 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure3: ", procedure3);
 
                 var parameters3 = new Dictionary<string, object>                {
-                    { "@WorkspaceId", workspaceId },
-                    { "@from_date", fromDate },
-                    { "@to_date", toDate }
-                };
+            { "@WorkspaceId", workspaceId },
+            { "@from_date", fromDate },
+            { "@to_date", toDate }
+        };
                 messagesSentDetails = dbHandler.ExecuteDataTable(procedure3, parameters3, CommandType.StoredProcedure);
 
                 _logger.LogInformation("Messages sent details retrieved: {RowCount} rows.", messagesSentDetails?.Rows.Count ?? 0);
@@ -3557,8 +3492,8 @@ namespace TravelAd_Api.Controllers
                 string procedure4 = "GetRecipientCountByWorkspaceId";
 
                 var parameters4 = new Dictionary<string, object>                {
-                    { "@WorkspaceId", workspaceId }
-                };
+            { "@WorkspaceId", workspaceId }
+        };
 
                 recipientCount = dbHandler.ExecuteDataTable(procedure4, parameters4, CommandType.StoredProcedure);
 
@@ -3590,7 +3525,6 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
-
         //  [Authorize]
 
         [HttpGet]
@@ -5548,7 +5482,6 @@ namespace TravelAd_Api.Controllers
             }
         }
 
-
         [HttpGet]
         public IActionResult GetBillingFeatures([FromServices] IDbHandler dbHandler)
         {
@@ -5580,7 +5513,8 @@ namespace TravelAd_Api.Controllers
                     Price = row.Field<string>("price"),
                     CountrySymbol = row.Field<string>("country_symbol"),
                     Name = row.Field<string>("name"),
-                    UpdatedAt = row.Field<DateTime?>("updated_at")
+                    UpdatedAt = row.Field<DateTime?>("updated_at"),
+                    Status = row.Field<string>("status")
                 }).ToList();
 
                 _logger.LogInformation("Billing features retrieved successfully: {BillingFeatureList}", billingFeatureData);
@@ -5605,7 +5539,6 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
-
 
         [HttpPut]
         public IActionResult UpdateBillingFeature(
@@ -7688,7 +7621,167 @@ namespace TravelAd_Api.Controllers
             }
         }
 
+        [HttpPost]
+        public IActionResult GetPersonalinfoByEmail([FromBody] GetPersonalinfoByEmail request, [FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+                string storedProcedure = "GetPersonalinfo";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", storedProcedure);
 
+                var parameters = new Dictionary<string, object>
+{
+    { "@user_email", request.UserEmail }
+};
+
+                _logger.LogInformation("Stored procedure parameters: {Parameters}", parameters);
+
+                // Execute the stored procedure
+                DataTable resultTable = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
+
+                if (resultTable.Rows.Count == 0)
+                {
+                    _logger.LogInformation("No personal info found for the provided email: {UserEmail}", request.UserEmail);
+
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No personal info found for the given email ID."
+                    });
+                }
+
+                // Map the DataTable rows to a list of strongly-typed objects
+                var personalInfoList = resultTable.AsEnumerable().Select(row => new
+                {
+                    FirstName = row.Field<string>("first_name"),
+                    LastName = row.Field<string>("last_name"),
+                    Email = row.Field<string>("email"),
+                    UserPersonalId = row.Field<int>("user_personal_id"),
+                    workspace_type = row.Field<string>("workspace_type"),
+                }).ToList();
+
+                _logger.LogInformation("Personal info retrieved successfully: {PersonalInfoList}", personalInfoList);
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Personal info retrieved successfully.",
+                    PersonalInfoList = personalInfoList
+                });
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "An error occurred while retrieving personal info for email: {UserEmail}", request.UserEmail);
+
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving personal info: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpPost]
+
+        public IActionResult ChangeStatusToggle([FromBody] StatusToggleRequest request, [FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+                if (request == null || request.BillingId <= 0 || string.IsNullOrEmpty(request.Status))
+                {
+                    _logger.LogWarning("Invalid input: BillingId or Status is missing or invalid");
+                    return BadRequest(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "BillingId and Status are required"
+                    });
+                }
+
+                // Validate status values - matching your Switch component values
+                if (request.Status != "Active" && request.Status != "Inactive")
+                {
+                    _logger.LogWarning("Invalid status value: {Status}. Only 'Active' or 'Inactive' are allowed", request.Status);
+                    return BadRequest(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "Status must be either 'Active' or 'Inactive'"
+                    });
+                }
+
+                string storedProcedureName = "UpdateBillingStatusByBillingId";
+                _logger.LogInformation("Executing stored procedure: {StoredProcedureName} with BillingId: {BillingId}, Status: {Status}",
+                    storedProcedureName, request.BillingId, request.Status);
+
+                var parameters = new Dictionary<string, object>
+        {
+            { "@BillingId", request.BillingId },
+            { "@Status", request.Status }
+        };
+
+                int rowsAffected = dbHandler.ExecuteNonQuery(storedProcedureName, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogWarning("No matching record found for BillingId: {BillingId}", request.BillingId);
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No matching record found"
+                    });
+                }
+
+                _logger.LogInformation("Status toggled to {Status} for BillingId: {BillingId}", request.Status, request.BillingId);
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = $"Status toggled to {request.Status} successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while toggling the status for BillingId: {BillingId}", request?.BillingId);
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpPost]
+        public object insertworkspacebillstatus([FromServices] IDbHandler dbHandler, int personalid, string workspacename, string workspaceid)
+        {
+            try
+            {
+                string insertbillingstatus = "InsertWorkspaceBillingStatus";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", insertbillingstatus);
+
+                var parameter_1 = new Dictionary<string, object>();
+                parameter_1.Add("@workspace_id", workspaceid);
+                parameter_1.Add("@workspacename", workspacename);
+                parameter_1.Add("@personalid", personalid);
+                object result_1 = dbHandler.ExecuteScalar(insertbillingstatus, parameter_1, CommandType.StoredProcedure);
+
+                _logger.LogInformation("workspace billing record Inserted sucessfully");
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "workspace billing record Inserted sucessfully"
+                });
+
+                return result_1;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"An error occurred while insertng billing status, Error: {ex}");
+                object result_1 = null;
+                return result_1;
+            }
+
+
+        }
 
     }
 

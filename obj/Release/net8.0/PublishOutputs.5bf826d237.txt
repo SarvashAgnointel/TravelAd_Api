@@ -1,6 +1,7 @@
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\TravelAd_Api.exe
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\log4net.config
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\publish\log4net.config
+D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\publish\web.config
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\appsettings.json
 D:\TravelAd\Backend\Backend\Agno-API-TravelAD-v1.0-dev\TravelAd_Api\TravelAd_Api\obj\Release\net8.0\PubTmp\Out\publish\appsettings.Development.json

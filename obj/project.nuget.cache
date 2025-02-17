@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xHnGv8+HAP4=",
+  "dgSpecHash": "0gGUkJ5iGko=",
   "success": true,
-  "projectFilePath": "D:\\TravelAd\\Backend\\Backend\\Agno-API-TravelAD-v1.0-dev\\TravelAd_Api\\TravelAd_Api\\TravelAd_Api.csproj",
+  "projectFilePath": "D:\\TravelAd\\Backend\\Backend\\Backend\\Agno-API-TravelAD-v1.0-dev\\TravelAd_Api\\TravelAd_Api\\TravelAd_Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\HP\\.nuget\\packages\\amazon.extensions.s3.encryption\\2.2.1\\amazon.extensions.s3.encryption.2.2.1.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\awssdk.core\\3.7.401.11\\awssdk.core.3.7.401.11.nupkg.sha512",

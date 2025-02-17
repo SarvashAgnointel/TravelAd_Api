@@ -18,58 +18,36 @@ namespace TravelAd_Api.Models
             public int ChannelType { get; set; }
 
             public string TargetCountry { get; set; }
-
             public string RoamingCountry { get; set; }
-
             public DateTime? StartDateTime { get; set; }
-
             public DateTime? EndDateTime { get; set; }
-
             public string Status { get; set; }
-
             public string TemplateName { get; set; }
-
             public int CreatedBy { get; set; }
-
             public DateTime? CreatedDate { get; set; }
-
             public int UpdatedBy { get; set; }
-
             public DateTime? UpdatedDate { get; set; }
-
             public int WorkspaceId { get; set; }
-
-            public int ListId { get; set; }
-
-            public int workspace_id { get; set; }
-
-            public int List_id { get; set; }
-            public int device_id { get; set; }
+            public int? ListId { get; set; }
+            public int? DeviceId { get; set; }
 
             public string Delivered { get; set; }
             public string ReadCampaign { get; set; }
-
             public string CTR { get; set; }
             public string DeliveryRate { get; set; }
-
             public string ButtonClick { get; set; }
-            public int Age { get; set; }
 
-            public int Gender { get; set; }
-            public int IncomeLevel { get; set; }
-
-            public int Location { get; set; }
-
-            public int Interests { get; set; }
-            public int Behaviours { get; set; }
-
-            public int OSDevice { get; set; }
+            public int? Age { get; set; }
+            public int? Gender { get; set; }
+            public int? IncomeLevel { get; set; }
+            public int? Location { get; set; }
+            public int? Interests { get; set; }
+            public int? Behaviours { get; set; }
+            public int? OSDevice { get; set; }
 
             public string FCampaignBudget { get; set; }
             public DateTime? FStartDateTime { get; set; }
-
             public DateTime? FEndDateTime { get; set; }
-
             public string IsAdminApproved { get; set; }
             public string IsOperatorApproved { get; set; }
             public string BudgetAndSchedule { get; set; }
@@ -79,8 +57,7 @@ namespace TravelAd_Api.Models
             public int? DailyRecipientLimit { get; set; }
             public DateTime? DeliveryStartTime { get; set; }
             public DateTime? DeliveryEndTime { get; set; }
-
-            public string sms_number { get; set; }
+            public string SmsNumber { get; set; }
         }
 
         public class TemplateDetailsModel
@@ -438,8 +415,12 @@ namespace TravelAd_Api.Models
             public int Id { get; set; }
 
         }
-        
 
+        public class StatusToggleRequest
+        {
+            public int BillingId { get; set; }
+            public string Status { get; set; }
+        }
     }
     }
 
