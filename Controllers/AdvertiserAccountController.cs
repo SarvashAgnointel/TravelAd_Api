@@ -6938,7 +6938,7 @@ namespace TravelAd_Api.Controllers
     },
                 Mode = "payment",
                 UiMode = "embedded",
-                ReturnUrl = "http://localhost:3000/settings/Billing", // Success page
+                ReturnUrl = $"{_configuration["FrontendUrl"]}settings/Billing", // Success page
                 AutomaticTax = new SessionAutomaticTaxOptions { Enabled = true },
 
                 // Enable billing address collection
