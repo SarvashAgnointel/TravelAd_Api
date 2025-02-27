@@ -1,1 +1,1 @@
-web: dotnet TravelAd_Api.dll
+web: dotnet /var/app/current/publish/TravelAd_Api.dll
