@@ -442,18 +442,6 @@
         }
       }
     },
-    "/AdvertiserAccount/api/SendTestMessage/send": {
-      "get": {
-        "tags": [
-          "AdvertiserAccount"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/AdvertiserAccount/api/GetChannelList": {
       "get": {
         "tags": [

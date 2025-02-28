@@ -13,7 +13,6 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
-using TravelAd_Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,7 +124,6 @@ builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddTransient<S3Service>(); ;
 builder.Services.AddHostedService<FileDownloadAndBackupService>();
 builder.Services.AddSingleton<IDbHandler, DbHandler>();
-builder.Services.AddSignalR();
 
 
 var app = builder.Build();
@@ -155,7 +153,6 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<NotificationHub>("/campaignStatusHub");
     endpoints.MapFallback(context =>
     {
         Console.WriteLine($"Unhandled request: {context.Request.Method} {context.Request.Path}");

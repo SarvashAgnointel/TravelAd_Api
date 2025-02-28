@@ -28,8 +28,7 @@ using Stripe;
 using Stripe.Checkout;
 using Microsoft.Extensions.Options;
 using static TravelAd_Api.Models.AdminModel;
-using Microsoft.AspNetCore.SignalR;
-using TravelAd_Api.Hubs;
+
 
 
 namespace TravelAd_Api.Controllers
@@ -44,16 +43,14 @@ namespace TravelAd_Api.Controllers
         private readonly IDbHandler _dbHandler;
         private readonly ILogger<AdvertiserAccountController> _logger;
         private readonly Stripesettings _stripeSettings;
-        private readonly IHubContext<NotificationHub> _hubContext;
 
 
-        public AdvertiserAccountController(IConfiguration configuration, IDbHandler dbHandler, ILogger<AdvertiserAccountController> logger, IOptions<Stripesettings> stripeSettings,IHubContext<NotificationHub> hubContext)
+        public AdvertiserAccountController(IConfiguration configuration, IDbHandler dbHandler, ILogger<AdvertiserAccountController> logger, IOptions<Stripesettings> stripeSettings)
         {
             _configuration = configuration;
             _dbHandler = dbHandler;
             _logger = logger;
             _stripeSettings = stripeSettings.Value;
-            _hubContext = hubContext;
 
         }
         //private static readonly ILog Log = LogManager.GetLogger(typeof(AdvertiserAccountController));
@@ -89,12 +86,7 @@ namespace TravelAd_Api.Controllers
             };
         }
 
-        [HttpGet("send")]
-        public async Task<IActionResult> SendTestMessage()
-        {
-            await _hubContext.Clients.All.SendAsync("ReceiveLiveCampaignUpdate", 9999);
-            return Ok("Message Sent to WebSocket Clients!");
-        }
+
 
 
         //__________________________________AdvertiserAccount Module----------------------------------------//

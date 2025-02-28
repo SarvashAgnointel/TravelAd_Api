@@ -1956,16 +1956,6 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
-    "Method": "SendTestMessage",
-    "RelativePath": "AdvertiserAccount/api/SendTestMessage/send",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "SubscribeToWebhook",
     "RelativePath": "AdvertiserAccount/api/SubscribeToWebhook",
     "HttpMethod": "POST",
