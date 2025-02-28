@@ -162,6 +162,8 @@ namespace AgnoCon.Controllers
 
             return DtToJSON(dtmain);
         }
+
+
         [HttpPost]
         public async Task<object> CheckEmailExistsAsync(TravelAd_Api.Models.ApiModel.UserVerify uv, [FromServices] IDbHandler dbHandler, [FromServices] IMemoryCache memoryCache)
         {

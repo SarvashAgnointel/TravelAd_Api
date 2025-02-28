@@ -442,72 +442,10 @@
         }
       }
     },
-    "/Admin/api/GetAdminCampaignColumns": {
+    "/AdvertiserAccount/api/SendTestMessage/send": {
       "get": {
         "tags": [
-          "Admin"
-        ],
-        "parameters": [
-          {
-            "name": "EmailId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/Admin/api/UpdateAdminCampaignColumns": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/Admin/api/GetWorkspaceBillingStatus": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "parameters": [
-          {
-            "name": "workspaceId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+          "AdvertiserAccount"
         ],
         "responses": {
           "200": {
@@ -1063,7 +1001,7 @@
         }
       }
     },
-    "/AdvertiserAccount/api/GetAccessToken/GetAccessToken": {
+    "/AdvertiserAccount/api/InsertWabaDetails": {
       "post": {
         "tags": [
           "AdvertiserAccount"
@@ -3628,6 +3566,80 @@
         }
       }
     },
+    "/AdvertiserAccount/api/GetAdminCampaignColumns": {
+      "get": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "parameters": [
+          {
+            "name": "EmailId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/UpdateAdminCampaignColumns": {
+      "post": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminCampaignColumnsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AdvertiserAccount/api/GetWorkspaceBillingStatus": {
+      "get": {
+        "tags": [
+          "AdvertiserAccount"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/Authentication/api/UserLogin": {
       "post": {
         "tags": [
@@ -4488,15 +4500,7 @@
         ],
         "parameters": [
           {
-            "name": "serverId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "ConnectionId",
+            "name": "ServerId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -4508,17 +4512,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SmppConnectionRequest"
+                "$ref": "#/components/schemas/SmppConnection"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/SmppConnectionRequest"
+                "$ref": "#/components/schemas/SmppConnection"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/SmppConnectionRequest"
+                "$ref": "#/components/schemas/SmppConnection"
               }
             }
           }
@@ -5430,7 +5434,11 @@
       "OAuthCallbackRequest": {
         "type": "object",
         "properties": {
-          "code": {
+          "wabaId": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneId": {
             "type": "string",
             "nullable": true
           },
@@ -5616,6 +5624,22 @@
           "message": {
             "type": "string",
             "nullable": true
+          },
+          "senderTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderNPI": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "receiverTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "receiverNPI": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -5623,6 +5647,10 @@
       "SendSmsRequest": {
         "type": "object",
         "properties": {
+          "channelId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "sender": {
             "type": "string",
             "nullable": true
@@ -5635,7 +5663,57 @@
             "type": "string",
             "nullable": true
           },
+          "senderTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderNPI": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "receiverTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "receiverNPI": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SmppConnection": {
+        "type": "object",
+        "properties": {
           "channelId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "systemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "addressRange": {
+            "type": "string",
+            "nullable": true
+          },
+          "bindingTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bindingNPI": {
             "type": "integer",
             "format": "int32"
           }
@@ -5669,13 +5747,33 @@
             "type": "string",
             "nullable": true
           },
-          "createdDate": {
-            "type": "string",
-            "format": "date-time"
-          },
           "serverId": {
-            "type": "string",
-            "nullable": true
+            "type": "integer",
+            "format": "int32"
+          },
+          "bindingTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bindingNPI": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderNPI": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "destinationTON": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "destinationNPI": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -5796,6 +5894,10 @@
             "nullable": true
           },
           "serverId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "connectionId": {
             "type": "integer",
             "format": "int32"
           }

@@ -62,19 +62,15 @@ namespace TravelAd_Api.Controllers
 
 
 
-        /// 📌 Connect to SMPP Server (Calls MessageController in another project)
         [HttpPost("connect")]
-        public async Task<IActionResult> ConnectAsync([FromBody] SmppConnectionRequest request,int serverId, int ConnectionId)
+        public async Task<IActionResult> ConnectAsync([FromBody] SmppConnection request, int ServerId)
         {
             if (request == null)
                 return BadRequest(new { Status = "Error", Status_Description = "❌ Invalid request. Please provide connection details." });
 
             try
             {
-               
-
-                //var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
-                var otherProjectBaseUrl = GetServerUrl(serverId);
+                var otherProjectBaseUrl = GetServerUrl(ServerId);
                 var url = $"{otherProjectBaseUrl}/Message/connect";
 
                 var jsonContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
@@ -88,16 +84,15 @@ namespace TravelAd_Api.Controllers
             }
         }
 
-        /// 📌 Send SMS (Calls MessageController in another project)
+
         [HttpPost("send")]
-        public async Task<IActionResult> SendSmsAsync([FromBody] SendSmsRequest request,int serverId, int ConnectionId)
+        public async Task<IActionResult> SendSmsAsync([FromBody] SendSmsRequest request, int serverId, int ConnectionId)
         {
             if (request == null)
                 return BadRequest(new { Status = "Error", Status_Description = "❌ Invalid request. Please provide SMS details." });
 
             try
             {
-                //var otherProjectBaseUrl = _configuration["OtherProject:BaseUrl"];
                 var otherProjectBaseUrl = GetServerUrl(serverId);
                 var url = $"{otherProjectBaseUrl}/Message/send";
 
@@ -111,7 +106,8 @@ namespace TravelAd_Api.Controllers
                 return HandleException(ex, "Error sending SMS.");
             }
         }
-
+        
+        
         /// 📌 Send Bulk SMS (Calls MessageController in another project)
         [HttpPost("sendBulk")]
         public async Task<IActionResult> SendBulkSmsAsync([FromBody] SendBulkSmsRequest request, int serverId, int ConnectionId)
@@ -396,11 +392,11 @@ namespace TravelAd_Api.Controllers
                 string getConnectionList = "GetSmsConnections";
 
                 var parameters = new Dictionary<string, object>
-                {
-                    {"server_id",ServerId },
-                    {"@ConnectionId",null },
-                    {"@Mode",null }
-                };
+        {
+            {"@ServerId", ServerId },
+            {"@ConnectionId", null },
+            {"@Mode", null }
+        };
 
                 _logger.LogInformation("Executing stored procedure: {ProcedureName}", getConnectionList);
 
@@ -418,23 +414,23 @@ namespace TravelAd_Api.Controllers
 
                 var connectionListData = connectionList.AsEnumerable().Select(row => new
                 {
-
-
+                    Id = row.Field<int>("connection_id"),
                     ChannelName = row.Field<string>("channel_name"),
-
-                    Id = row.Field<int>("channel_id"),
                     Type = row.Field<string>("type"),
                     Host = row.Field<string>("host"),
                     Port = row.Field<int>("port"),
                     SystemId = row.Field<string>("system_id"),
                     Password = row.Field<string>("password"),
                     Created_date = row.Field<DateTime>("created_date"),
-
+                    BindingTON = row.Field<int?>("binding_ton") ?? 0, // Default to 0 if null
+                    BindingNPI = row.Field<int?>("binding_npi") ?? 0,
+                    SenderTON = row.Field<int?>("sender_ton") ?? 5,
+                    SenderNPI = row.Field<int?>("sender_npi") ?? 0,
+                    DestinationTON = row.Field<int?>("destination_ton") ?? 1,
+                    DestinationNPI = row.Field<int?>("destination_npi") ?? 1
                 }).ToList();
 
-
                 _logger.LogInformation("Connections retrieved successfully");
-                _logger.LogInformation("Requests: {@connectionListData}", connectionListData);
 
                 return Ok(new
                 {
@@ -463,11 +459,11 @@ namespace TravelAd_Api.Controllers
                 string getConnectionList = "GetSmsConnections";
 
                 var parameters = new Dictionary<string, object>
-                {
-                    {"server_id",ServerId },
-                    {"@ConnectionId",ConnectionId },
-                    {"@Mode","ById" }
-                };
+        {
+            {"server_id", ServerId },
+            {"@ConnectionId", ConnectionId },
+            {"@Mode", "ById" }
+        };
 
                 _logger.LogInformation("Executing stored procedure: {ProcedureName}", getConnectionList);
 
@@ -485,23 +481,23 @@ namespace TravelAd_Api.Controllers
 
                 var connectionListData = connectionList.AsEnumerable().Select(row => new
                 {
-
-
+                    Id = row.Field<int>("connection_id"),
                     ChannelName = row.Field<string>("channel_name"),
-
-                    Id = row.Field<int>("channel_id"),
                     Type = row.Field<string>("type"),
                     Host = row.Field<string>("host"),
                     Port = row.Field<int>("port"),
                     SystemId = row.Field<string>("system_id"),
                     Password = row.Field<string>("password"),
                     Created_date = row.Field<DateTime>("created_date"),
-
+                    BindingTON = row.Field<int?>("binding_ton") ?? 0,
+                    BindingNPI = row.Field<int?>("binding_npi") ?? 0,
+                    SenderTON = row.Field<int?>("sender_ton") ?? 5,
+                    SenderNPI = row.Field<int?>("sender_npi") ?? 0,
+                    DestinationTON = row.Field<int?>("destination_ton") ?? 1,
+                    DestinationNPI = row.Field<int?>("destination_npi") ?? 1
                 }).ToList();
 
-
                 _logger.LogInformation("Connections retrieved successfully");
-                _logger.LogInformation("Requests: {@connectionListData}", connectionListData);
 
                 return Ok(new
                 {
@@ -525,52 +521,52 @@ namespace TravelAd_Api.Controllers
         [HttpPost("createconnection")]
         public object CreateConnection([FromBody] SmppConnectionRequest cc)
         {
-
-
             try
             {
-
                 string insertQuery = "InsertSmsConnection";
 
                 var parameters = new Dictionary<string, object>
+        {
+            {"ChannelName", cc.ChannelName },
+            {"Type", cc.Type },
+            {"Host", cc.Host },
+            {"Port", cc.Port },
+            {"SystemId", cc.SystemId },
+            {"Password", cc.Password },
+            {"CreatedDate", DateTime.Now },
+            {"ServerId", cc.ServerId },
+            {"BindingTON", cc.BindingTON },
+            {"BindingNPI", cc.BindingNPI },
+            {"SenderTON", cc.SenderTON },
+            {"SenderNPI", cc.SenderNPI },
+            {"DestinationTON", cc.DestinationTON },
+            {"DestinationNPI", cc.DestinationNPI }
+        };
+
+                object resultObj = _dbHandler.ExecuteScalar(insertQuery, parameters, CommandType.StoredProcedure);
+                int channelId = resultObj != null ? Convert.ToInt32(resultObj) : 0;
+
+                if (channelId > 0)
                 {
-                    {"channel_name", cc.ChannelName },
-                    {"type", cc.Type },
-                    {"host", cc.Host },
-                    {"port", cc.Port },
-                    {"system_id", cc.SystemId },
-                    {"password", cc.Password },
-                    {"created_date", DateTime.Now },
-                    {"server_id",cc.ServerId }
-                };
-
-                object result = _dbHandler.ExecuteScalar(insertQuery, parameters, CommandType.StoredProcedure);
-
-                if (result != null)
-                {
-
                     return Ok(new
                     {
                         Status = "Success",
-                        Status_Description = $"Connection inserted successfully  with ID: {result}",
-                        channel_id = result
+                        Status_Description = $"Connection inserted successfully with ID: {channelId}",
+                        channel_id = channelId
                     });
                 }
                 else
                 {
                     return BadRequest(new
                     {
-
                         Status = "Error",
                         Status_Description = "Insertion failed.",
                         channel_id = (object)null
-
                     });
                 }
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, new
                 {
                     Status = "Error",
@@ -578,7 +574,6 @@ namespace TravelAd_Api.Controllers
                     channel_id = (object)null
                 });
             }
-
         }
 
     }

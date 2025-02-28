@@ -1,5 +1,4 @@
 using DBAccess; // Ensure this is the correct namespace for IDbHandler and DbHandler
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Net;
 using Microsoft.Extensions.Logging;
@@ -11,6 +10,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TravelAd_Api.DataLogic;
 using Amazon.S3;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using TravelAd_Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,25 +38,22 @@ builder.Services.AddMemoryCache();
 builder.Services.AddAuthorization();
 
 
-var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<List<string>>();
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowSpecificOrigin",
-//        builder => builder.WithOrigins(allowedOrigins.ToArray())
-//                          .AllowAnyHeader()
-//                          .AllowAnyMethod()
-//                          .AllowCredentials());
-//});
+//var _logger = new LoggerConfiguration()
+//  .ReadFrom.Configuration(builder.Configuration)
+//.Enrich.FromLogContext().CreateLogger();
+//builder.Logging.ClearProviders();
+//builder.Logging.AddSerilog(_logger);
+
+// Configure CORS
+
+
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<List<string>>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        builder => builder.WithOrigins("http://192.168.8.240:3000",
-                                       "http://localhost:3000",
-                                       "http://18.196.60.242:3000",
-                                       "http://3.76.247.193:5000",
-                                       "http://3.68.199.69:5000")
+        builder => builder.WithOrigins(allowedOrigins.ToArray())
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials());
@@ -73,6 +73,16 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddScoped<JWT>();
 builder.Services.Configure<Stripesettings>(builder.Configuration.GetSection("Stripe"));
+
+//builder.Services.AddAuthentication().AddFacebook(opt =>
+//{
+//    opt.ClientId = "590306753515087";
+//    opt.ClientSecret = "3c28ba8bd505299ab85734aff4064d4c";
+
+//});
+
+//Configure Serilog
+
 
 // Base directory for all logs
 string baseLogDirectory = @"C:\TravelAD_Api\Logs";
@@ -115,6 +125,8 @@ builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddTransient<S3Service>(); ;
 builder.Services.AddHostedService<FileDownloadAndBackupService>();
 builder.Services.AddSingleton<IDbHandler, DbHandler>();
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 
@@ -143,6 +155,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/campaignStatusHub");
     endpoints.MapFallback(context =>
     {
         Console.WriteLine($"Unhandled request: {context.Request.Method} {context.Request.Path}");

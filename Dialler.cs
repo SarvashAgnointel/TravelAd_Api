@@ -28,6 +28,8 @@ public class Dialler
     }
     private WhatsappAccountDetails GetWhatsappAccountDetailsByWId(int workspaceId)
     {
+        var builder = new ConfigurationBuilder();
+        IConfiguration config = builder.Build();
         string procedure = "GetWhatsappAccountDetailsById";
 
         var parameters = new Dictionary<string, object>
@@ -45,7 +47,7 @@ public class Dialler
         {
             WabaId = campaignDetailsById.Rows[0]["wabaId"].ToString(),
             PhoneId = campaignDetailsById.Rows[0]["phoneId"].ToString(),
-            AccessToken = campaignDetailsById.Rows[0]["accessToken"].ToString()
+            AccessToken = config["WhatsAppToken"]
         };
     }
 
@@ -403,6 +405,8 @@ public class Dialler
 
     public static string ExtractBodyComponent(string inputJson, string templateId)
     {
+        var builder = new ConfigurationBuilder();
+        IConfiguration config = builder.Build();
         JArray originalJson = JArray.Parse(inputJson);
         var transformedJson = new JArray();
 
@@ -441,7 +445,7 @@ public class Dialler
                         ["type"] = "image",
                         ["image"] = new JObject
                         {
-                            ["link"] = $"https://travelad.agnointel.ai/AdvertiserAccount/api/GetFile?templateId={templateId}" // Provide the image link
+                            ["link"] = $"{config["BackendUrl"]}AdvertiserAccount/api/GetFile?templateId={templateId}" // Provide the image link
                         }
                     };
                 }

@@ -264,7 +264,8 @@ namespace TravelAd_Api.Models
 
         public class OAuthCallbackRequest
         {
-            public string Code { get; set; }
+            public string WabaId { get; set; }
+            public string PhoneId { get; set; }
             public string EmailId { get; set; }            
             public int workspaceId { get; set; }
         }

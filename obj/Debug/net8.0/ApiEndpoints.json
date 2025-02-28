@@ -59,22 +59,6 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdminController",
-    "Method": "GetAdminCampaignColumns",
-    "RelativePath": "Admin/api/GetAdminCampaignColumns",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "EmailId",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TravelAd_Api.Controllers.AdminController",
     "Method": "GetAdminDashboardChartDetails",
     "RelativePath": "Admin/api/GetAdminDashboardChartDetails",
     "HttpMethod": "GET",
@@ -270,22 +254,6 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdminController",
-    "Method": "GetWorkspaceBillingStatus",
-    "RelativePath": "Admin/api/GetWorkspaceBillingStatus",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "workspaceId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TravelAd_Api.Controllers.AdminController",
     "Method": "GetWorkspaceCount",
     "RelativePath": "Admin/api/GetWorkspaceCount",
     "HttpMethod": "GET",
@@ -332,22 +300,6 @@
         "Name": "mode",
         "Type": "System.String",
         "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TravelAd_Api.Controllers.AdminController",
-    "Method": "UpdateAdminCampaignColumns",
-    "RelativePath": "Admin/api/UpdateAdminCampaignColumns",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "TravelAd_Api.Models.AdminModel\u002BUpdateAdminCampaignColumnsRequest",
-        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -815,16 +767,16 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
-    "Method": "GetAccessToken",
-    "RelativePath": "AdvertiserAccount/api/GetAccessToken/GetAccessToken",
-    "HttpMethod": "POST",
+    "Method": "GetAdminCampaignColumns",
+    "RelativePath": "AdvertiserAccount/api/GetAdminCampaignColumns",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BOAuthCallbackRequest",
-        "IsRequired": true
+        "Name": "EmailId",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -1771,6 +1723,22 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "GetWorkspaceBillingStatus",
+    "RelativePath": "AdvertiserAccount/api/GetWorkspaceBillingStatus",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "workspaceId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "GetWorkspaceDetailsByEmail",
     "RelativePath": "AdvertiserAccount/api/GetWorkspaceDetailsByEmail",
     "HttpMethod": "POST",
@@ -1888,6 +1856,22 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "InsertWabaDetails",
+    "RelativePath": "AdvertiserAccount/api/InsertWabaDetails",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BOAuthCallbackRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "insertworkspacebillstatus",
     "RelativePath": "AdvertiserAccount/api/insertworkspacebillstatus",
     "HttpMethod": "POST",
@@ -1972,6 +1956,16 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "SendTestMessage",
+    "RelativePath": "AdvertiserAccount/api/SendTestMessage/send",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
     "Method": "SubscribeToWebhook",
     "RelativePath": "AdvertiserAccount/api/SubscribeToWebhook",
     "HttpMethod": "POST",
@@ -2030,6 +2024,22 @@
         "Name": "workspaceId",
         "Type": "System.Int32",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "UpdateAdminCampaignColumns",
+    "RelativePath": "AdvertiserAccount/api/UpdateAdminCampaignColumns",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BUpdateAdminCampaignColumnsRequest",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -2972,16 +2982,11 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "TravelAd_Api.Models.SmsModel\u002BSmppConnectionRequest",
+        "Type": "TravelAd_Api.Models.SmsModel\u002BSmppConnection",
         "IsRequired": true
       },
       {
-        "Name": "serverId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "ConnectionId",
+        "Name": "ServerId",
         "Type": "System.Int32",
         "IsRequired": false
       }

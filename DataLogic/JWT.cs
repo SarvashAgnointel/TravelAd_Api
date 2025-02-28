@@ -35,5 +35,9 @@ namespace TravelAd_Api.DataLogic
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+
+
+
     }
 }

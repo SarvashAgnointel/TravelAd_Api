@@ -28,6 +28,8 @@ using Stripe;
 using Stripe.Checkout;
 using Microsoft.Extensions.Options;
 using static TravelAd_Api.Models.AdminModel;
+using Microsoft.AspNetCore.SignalR;
+using TravelAd_Api.Hubs;
 
 
 namespace TravelAd_Api.Controllers
@@ -42,18 +44,19 @@ namespace TravelAd_Api.Controllers
         private readonly IDbHandler _dbHandler;
         private readonly ILogger<AdvertiserAccountController> _logger;
         private readonly Stripesettings _stripeSettings;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
 
-        public AdvertiserAccountController(IConfiguration configuration, IDbHandler dbHandler, ILogger<AdvertiserAccountController> logger, IOptions<Stripesettings> stripeSettings)
+        public AdvertiserAccountController(IConfiguration configuration, IDbHandler dbHandler, ILogger<AdvertiserAccountController> logger, IOptions<Stripesettings> stripeSettings,IHubContext<NotificationHub> hubContext)
         {
             _configuration = configuration;
             _dbHandler = dbHandler;
             _logger = logger;
             _stripeSettings = stripeSettings.Value;
+            _hubContext = hubContext;
 
         }
         //private static readonly ILog Log = LogManager.GetLogger(typeof(AdvertiserAccountController));
-
 
         private string DtToJSON(DataTable table)
         {
@@ -61,28 +64,6 @@ namespace TravelAd_Api.Controllers
             return jsonString;
         }
 
-        //    private WhatsappAccountDetails GetWhatsappAccountDetails(string emailId)
-        //    {
-        //        string procedure = "GetWhatsappAccountDetails";
-
-        //        var parameters = new Dictionary<string, object>
-        //{
-        //    { "@EmailId", emailId }
-        //};
-        //        DataTable campaignDetailsById = _dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
-
-        //        if (campaignDetailsById.Rows.Count == 0)
-        //        {
-        //            return null;
-        //        }
-
-        //        return new WhatsappAccountDetails
-        //        {
-        //            WabaId = campaignDetailsById.Rows[0]["wabaId"].ToString(),
-        //            PhoneId = campaignDetailsById.Rows[0]["phoneId"].ToString(),
-        //            AccessToken = campaignDetailsById.Rows[0]["accessToken"].ToString()
-        //        };
-        //    }
 
         private WhatsappAccountDetails GetWhatsappAccountDetailsByWId(int workspaceId)
         {
@@ -104,15 +85,21 @@ namespace TravelAd_Api.Controllers
             {
                 WabaId = campaignDetailsById.Rows[0]["wabaId"].ToString(),
                 PhoneId = campaignDetailsById.Rows[0]["phoneId"].ToString(),
-                AccessToken = campaignDetailsById.Rows[0]["accessToken"].ToString()
+                AccessToken = _configuration["WhatsAppToken"]
             };
         }
 
+        [HttpGet("send")]
+        public async Task<IActionResult> SendTestMessage()
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveLiveCampaignUpdate", 9999);
+            return Ok("Message Sent to WebSocket Clients!");
+        }
 
 
         //__________________________________AdvertiserAccount Module----------------------------------------//
 
-       // [Authorize]
+        // [Authorize]
         [HttpGet]
         public IActionResult GetChannelList([FromServices] IDbHandler dbHandler)
         {
@@ -296,6 +283,7 @@ namespace TravelAd_Api.Controllers
                     delivery_start_time = row.Field<DateTime?>("delivery_start_time"),
                     delivery_end_time = row.Field<DateTime?>("delivery_end_time"),
                     smpp_id = row.Field<int?>("smpp_id"),
+                    sms_connection_id = row.Field<int?>("sms_connection_id")
                 }).ToList();
 
                 _logger.LogInformation("Campaign retrieved successfully. Response: {CampaignListByIdData}", campaignListByIdData);
@@ -1022,9 +1010,9 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure: {ProcedureName}", procedure);
 
                 var parameters = new Dictionary<string, object>
-       {
-           { "@EmailId", EmailId }
-       };
+    {
+        { "@EmailId", EmailId }
+    };
                 DataTable WorkspaceList = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
                 if (WorkspaceList == null || WorkspaceList.Rows.Count == 0)
                 {
@@ -1032,7 +1020,8 @@ namespace TravelAd_Api.Controllers
                     return Ok(new
                     {
                         Status = "Failure",
-                        Status_Description = "No workspaces found for mail"
+                        Status_Description = "No workspaces found for mail",
+                        WorkspaceCount = 0
                     });
                 }
 
@@ -1040,7 +1029,8 @@ namespace TravelAd_Api.Controllers
                 {
                     workspace_name = row.Field<string>("workspace_name"),
                     workspace_id = row.Field<int>("workspace_id"),
-                    workspace_image = row.Field<string>("workspace_image")
+                    workspace_image = row.Field<string>("workspace_image"),
+                    billing_country = row.Field<int>("billing_country")
                 }).ToList();
 
                 _logger.LogInformation("workspaces retrieved successfully");
@@ -1048,7 +1038,9 @@ namespace TravelAd_Api.Controllers
                 {
                     Status = "Success",
                     Status_Description = "workspaces retrieved successfully",
+                    WorkspaceCount = WorkspaceList.Rows.Count,
                     WorkspaceList = WorkspaceListData
+
                 });
             }
             catch (Exception ex)
@@ -1546,133 +1538,55 @@ namespace TravelAd_Api.Controllers
 
 
 
-        [HttpPost("GetAccessToken")]
-        public async Task<IActionResult> GetAccessToken([FromServices] IDbHandler dbHandler, [FromBody] OAuthCallbackRequest request)
+        [HttpPost]
+        public async Task<IActionResult> InsertWabaDetails([FromServices] IDbHandler dbHandler, [FromBody] OAuthCallbackRequest request)
         {
             try
             {
-                if (string.IsNullOrEmpty(request?.Code))
-                {
-                    _logger.LogWarning("Authorization code is missing for email: {EmailId}", request?.EmailId ?? "Unknown");
 
-                    return Ok(new
-                    {
-                        Status = "Failure",
-                        Status_Description = "Authorization code is missing."
-                    });
-                }
-
-                _logger.LogInformation("Received authorization code for email: {EmailId}", request.EmailId ?? "Unknown");
-
-                var appId = _configuration["FbAppId"];
-                var appSecret = _configuration["FbAppSecret"];
-
-                if (string.IsNullOrEmpty(appId) || string.IsNullOrEmpty(appSecret))
-                {
-                    _logger.LogError("Facebook App ID, Secret, or Redirect URI is missing from configuration.");
-                    return StatusCode(500, new
-                    {
-                        Status = "Error",
-                        Status_Description = "Missing Facebook API credentials in configuration."
-                    });
-                }
-
-                var tokenRequestUrl = $"https://graph.facebook.com/v21.0/oauth/access_token?" +
-                                      $"client_id={appId}&redirect_uri=" +
-                                      $"&client_secret={appSecret}&code={request.Code}";
-
-                _logger.LogInformation("Making request to Facebook API for access token: {TokenRequestUrl}", tokenRequestUrl);
-
-                using var client = new HttpClient();
-                var response = await client.GetAsync(tokenRequestUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Failed to retrieve access token from Facebook API for email: {EmailId}. Error: {ErrorContent}", request.EmailId ?? "Unknown", errorContent);
-
-                    return Ok(new
-                    {
-                        Status = "Failure",
-                        Status_Description = $"Failed to retrieve access token: {errorContent}"
-                    });
-                }
-
-                _logger.LogInformation("Successfully received response from Facebook API for email: {EmailId}", request.EmailId ?? "Unknown");
-
-                var content = await response.Content.ReadAsStringAsync();
-                string? accessToken = null;
-
-                try
-                {
-                    using var jsonDocument = System.Text.Json.JsonDocument.Parse(content);
-                    accessToken = jsonDocument.RootElement.GetProperty("access_token").GetString();
-                }
-                catch (Exception jsonEx)
-                {
-                    _logger.LogError(jsonEx, "Error parsing access token response from Facebook API.");
-                    return StatusCode(500, new
-                    {
-                        Status = "Error",
-                        Status_Description = "Error parsing access token response from Facebook."
-                    });
-                }
-
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    _logger.LogError("Error retrieving access token for email: {EmailId}", request.EmailId ?? "Unknown");
-
-                    return Ok(new
-                    {
-                        Status = "Failure",
-                        Status_Description = "Error retrieving access token"
-                    });
-                }
-
-                _logger.LogInformation("Access token retrieved successfully for email: {EmailId}", request.EmailId ?? "Unknown");
 
                 var procedure = "InsertWhatsappDetails";
                 var parameters = new Dictionary<string, object>
                     {
                         {"@EmailId", request.EmailId },
                         {"@workspaceId", request.workspaceId },
-                        {"@AccessToken", accessToken },
+                        {"@wabaId", request.WabaId },
+                        {"@phoneId", request.PhoneId },
                         {"@LastUpdated", DateTime.UtcNow },
                         {"@CreatedDate", DateTime.UtcNow }
                     };
 
-                _logger.LogInformation("Inserting token details into database for email: {EmailId}", request.EmailId ?? "Unknown");
+                _logger.LogInformation("Inserting waba details into database for email: {EmailId}", request.EmailId ?? "Unknown");
 
                 object? result = dbHandler.ExecuteScalar(procedure, parameters, CommandType.StoredProcedure);
 
                 if (result == null)
                 {
-                    _logger.LogError("Failed to save token details for email: {EmailId}", request.EmailId ?? "Unknown");
+                    _logger.LogError("Failed to save waba details for email: {EmailId}", request.EmailId ?? "Unknown");
 
                     return Ok(new
                     {
                         Status = "Failure",
-                        Status_Description = "Error saving token details"
+                        Status_Description = "Error saving waba details"
                     });
                 }
 
-                _logger.LogInformation("Token details saved successfully for email: {EmailId}", request.EmailId ?? "Unknown");
+                _logger.LogInformation("waba details saved successfully for email: {EmailId}", request.EmailId ?? "Unknown");
 
                 return Ok(new
                 {
                     Status = "Success",
-                    Status_Description = "Access token retrieved successfully.",
-                    Id = result
+                    Status_Description = "waba details inserted successfully.",
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving the access token for email: {EmailId}", request?.EmailId ?? "Unknown");
+                _logger.LogError(ex, "An error occurred while inserting waba details for email: {EmailId}", request?.EmailId ?? "Unknown");
 
                 return StatusCode(500, new
                 {
                     Status = "Error",
-                    Status_Description = $"An error occurred while retrieving the access token: {ex.Message}"
+                    Status_Description = $"An error occurred while inserting: {ex.Message}"
                 });
             }
         }
@@ -1765,7 +1679,7 @@ namespace TravelAd_Api.Controllers
                 var whatsappDetails = GetWhatsappAccountDetailsByWId(workspaceId);
 
                 // Check if AccessToken is null
-                if (string.IsNullOrEmpty(whatsappDetails?.AccessToken))
+                if (string.IsNullOrEmpty(whatsappDetails?.AccessToken) && string.IsNullOrEmpty(whatsappDetails?.WabaId) && string.IsNullOrEmpty(whatsappDetails?.PhoneId))
                 {
                     _logger.LogWarning("Access token is null or empty for email: {workspaceId}", workspaceId);
                     return Ok(new
@@ -3659,6 +3573,7 @@ namespace TravelAd_Api.Controllers
                 // Construct the request body, if necessary
                 var requestBody = new
                 {
+
                 };
 
                 // Serializing the body to JSON
@@ -6690,6 +6605,8 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
+
         [HttpGet]
         public IActionResult Getdebitdetails([FromServices] IDbHandler dbHandler, string emailid)
         {
@@ -6699,16 +6616,14 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure: {ProcedureName}", storedProcedure);
 
                 var parameters = new Dictionary<string, object>
-            {
-                { "@Email", emailid }
-            };
-                _logger.LogInformation("stored parameters: ", parameters);
+   {
+       { "@Email", emailid }
+   };
 
                 DataTable debitdetails = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
 
                 if (debitdetails == null || debitdetails.Rows.Count == 0)
                 {
-                    _logger.LogWarning("No debit details found");
                     return Ok(new
                     {
                         Status = "Failure",
@@ -6717,30 +6632,47 @@ namespace TravelAd_Api.Controllers
                     });
                 }
 
-                var workspacedebitdetails = debitdetails.AsEnumerable().Select((row, index) => new
+                // Check if this is an error message from the stored procedure
+                if (debitdetails.Columns.Contains("Message"))
                 {
+                    string message = debitdetails.Rows[0]["Message"].ToString();
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = message,
+                        usertransac = new List<object>()
+                    });
+                }
 
-                    symbol = row.Field<string>("symbol"),
-                    Amount = row.Field<decimal>("TotalAmount"),
-                    messagecount = row.Field<int>("TotalClosedCount"),
-                    paymentdate = row.Field<string>("paymentdate")
-
-                }).ToArray();
-
-
-                _logger.LogInformation("user debit details retrieved successfully: ", workspacedebitdetails);
-
-                return Ok(new
+                // If we get here, we should have the normal result set
+                try
                 {
-                    Status = "Success",
-                    Status_Description = "user debit details retrieved successfully",
-                    user_transaction = workspacedebitdetails
-                });
+                    var workspacedebitdetails = debitdetails.AsEnumerable()
+                        .Select(row => new
+                        {
+                            symbol = row.Field<string>("CurrencyName") ?? "", // Use CurrencyName instead of symbol
+                            Amount = row.Field<decimal>("TotalAmount"),
+                            messagecount = row.Field<int>("TotalClosedCount"),
+                            paymentdate = row.Field<string>("paymentdate") ?? ""
+                        }).ToArray();
+
+                    return Ok(new
+                    {
+                        Status = "Success",
+                        Status_Description = "user debit details retrieved successfully",
+                        user_transaction = workspacedebitdetails
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing result set. Columns available: {Columns}",
+                        string.Join(", ", debitdetails.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+                    throw;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError("An error occurred while retrieving the user debit details:", ex.Message);
-
+                _logger.LogError(ex, "An error occurred while retrieving the user debit details");
                 return StatusCode(500, new
                 {
                     Status = "Error",
@@ -8188,6 +8120,8 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
+
 
 
 

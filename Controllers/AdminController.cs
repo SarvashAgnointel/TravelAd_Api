@@ -906,13 +906,14 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure: {Query}", updateQuery);
 
                 var parameters = new Dictionary<string, object>
-                {
-                    {"@campaignId", uc.campaignId },
-                    {"@serverId", uc.serverId },
-                    {"@approverType","Admin" },
-                    {"@workspaceId",null },
-                    {"@approvalStatus", uc.status }
-                };
+               {
+                   {"@campaignId", uc.campaignId },
+                   {"@serverId", uc.serverId },
+                   {"@connectionId",uc.connectionId},
+                   {"@approverType","Admin" },
+                   {"@workspaceId",null },
+                   {"@approvalStatus", uc.status }
+               };
 
                 // Execute the stored procedure
                 int result = Convert.ToInt32(dbHandler.ExecuteScalar(updateQuery, parameters, CommandType.StoredProcedure));
