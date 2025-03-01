@@ -2419,6 +2419,38 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "CampaignWebhookController",
+    "Method": "UpdateCampaignStatus",
+    "RelativePath": "api/webhook/campaign-status",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "CampaignStatusUpdate",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CampaignWebhookController",
+    "Method": "GetLiveCampaigns",
+    "RelativePath": "api/webhook/live-campaigns/{workspaceId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "workspaceId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "TravelAd_Api.Controllers.WebhookController",
     "Method": "HandleWebhook",
     "RelativePath": "api/webhook/stripe",
@@ -2683,7 +2715,7 @@
   },
   {
     "ContainingType": "AgnoCon.Controllers.AuthenticationController",
-    "Method": "SendInvite",
+    "Method": "SendInviteAsync",
     "RelativePath": "Authentication/api/SendInvite/send-invite",
     "HttpMethod": "POST",
     "IsController": true,

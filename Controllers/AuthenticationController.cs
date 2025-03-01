@@ -867,7 +867,7 @@ namespace AgnoCon.Controllers
         //Send invitation module
 
         [HttpPost("send-invite")]
-        public IActionResult SendInvite([FromBody] List<InviteRequestModel> requests, [FromServices] IDbHandler dbHandler)
+        public async Task<IActionResult> SendInviteAsync([FromBody] List<InviteRequestModel> requests, [FromServices] IDbHandler dbHandler)
         {
             foreach (var request in requests)
             {
@@ -883,7 +883,7 @@ namespace AgnoCon.Controllers
 
                 string inviteUrl = $"{_configuration["FrontendUrl"]}/signup?token={token}";
 
-                bool emailSent = SendInviteEmail(request.Email, inviteUrl);
+                bool emailSent = await SendInviteEmail(request.Email, inviteUrl);
 
                 if (!emailSent)
                 {
@@ -904,7 +904,7 @@ namespace AgnoCon.Controllers
         new Claim("Email", payloadData.Email),
         new Claim("Name", payloadData.Name),
         new Claim("WorkspaceId", payloadData.WorkspaceId.ToString()),
-        new Claim("RoleId", payloadData.RoleId.ToString()) 
+        new Claim("RoleId", payloadData.RoleId.ToString())
     };
 
             var token = new JwtSecurityToken(
@@ -917,89 +917,118 @@ namespace AgnoCon.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private bool SendInviteEmail(string email, string inviteUrl)
+        private async Task<bool> SendInviteEmail(string email, string inviteUrl)
         {
             try
             {
-                var smtpClient = new SmtpClient("smtp.gmail.com")
+                // Log the beginning of the API call
+                _logger.LogInformation("Initializing Resend API call for invite email to: {Email}", email);
+
+                // Prepare the JSON payload
+                var requestPayload = new
                 {
-                    Port = 587,
-                    Credentials = new NetworkCredential(fromEmail, "bmpcnnyysmndsylt"), // Replace with actual credentials
-                    EnableSsl = true,
+                    from = "TravelAd@mytravelad.com",  // Update with your sender email as needed
+                    to = new[] { email },
+                    subject = "You're Invited!",
+                    // The email body includes a clickable link to the invite URL
+                    html = $"<p>You have been invited to join. Click the link to join: <a href='{inviteUrl}'>Join Now</a></p>"
                 };
 
-                var mailMessage = new MailMessage
+                // Convert payload to JSON
+                string jsonPayload = JsonConvert.SerializeObject(requestPayload);
+
+                // Create an HttpClient instance
+                using (HttpClient client = new HttpClient())
                 {
-                    From = new MailAddress(fromEmail),
-                    Subject = "You're Invited!",
-                    Body = $"You have been invited to join. Click the link to join: {inviteUrl}",
-                    IsBodyHtml = false,
-                };
+                    // Set up the authorization header with your Resend API key from configuration
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", _configuration["ResendApiKey"]);
 
-                mailMessage.To.Add(email);
-                smtpClient.Send(mailMessage);
+                    // Prepare the HTTP content with proper encoding and content type
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                return true;
+                    // Define the Resend API endpoint
+                    string resendApiUrl = _configuration["ResendApiUrl"];
+
+                    // Send the POST request to the Resend API
+                    HttpResponseMessage response = await client.PostAsync(resendApiUrl, content);
+
+                    // Check if the request was successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string successContent = await response.Content.ReadAsStringAsync();
+                        _logger.LogInformation("Invitation email sent successfully to {Email}. Response: {Response}", email, successContent);
+                        return true;
+                    }
+                    else
+                    {
+                        // Log any errors received from the API
+                        string errorContent = await response.Content.ReadAsStringAsync();
+                        _logger.LogError("Failed to send invite email to {Email}. Resend API error: {Error}", email, errorContent);
+                        return false;
+                    }
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Log any exceptions that occur during the process
+                _logger.LogError(ex, "Exception occurred while sending invite email to {Email}", email);
                 return false;
             }
         }
+        //        [HttpPost]
+        //        public object ForgotPassword(TravelAd_Api.Models.ApiModel.ForgotPasswordRequest request, [FromServices] IDbHandler dbHandler, [FromServices] IMemoryCache memoryCache)
+        //        {
+        //            DataTable dtmain = new DataTable();
+        //            dtmain.Columns.Add("Status");
+        //            dtmain.Columns.Add("Status_Description");
 
-//        [HttpPost]
-//        public object ForgotPassword(TravelAd_Api.Models.ApiModel.ForgotPasswordRequest request, [FromServices] IDbHandler dbHandler, [FromServices] IMemoryCache memoryCache)
-//        {
-//            DataTable dtmain = new DataTable();
-//            dtmain.Columns.Add("Status");
-//            dtmain.Columns.Add("Status_Description");
+        //            try
+        //            {
+        //                string checkEmailQuery = "dbo.userlogincheckemail";
+        //                var checkEmailParams = new Dictionary<string, object>
+        //{
+        //    { "@Email", request.Email },
+        //};
 
-//            try
-//            {
-//                string checkEmailQuery = "dbo.userlogincheckemail";
-//                var checkEmailParams = new Dictionary<string, object>
-//{
-//    { "@Email", request.Email },
-//};
+        //                object emailExists = dbHandler.ExecuteScalar(checkEmailQuery, checkEmailParams, CommandType.StoredProcedure);
 
-//                object emailExists = dbHandler.ExecuteScalar(checkEmailQuery, checkEmailParams, CommandType.StoredProcedure);
+        //                if (emailExists != null && Convert.ToInt32(emailExists) > 0)
+        //                {
+        //                    // Generate OTP
+        //                    string otp = GenerateOtp();
+        //                    int otpValue = int.Parse(otp);
+        //                    string hashedOtp = OtpService.HashOtp(otpValue);
+        //                    Console.WriteLine("Hashed OTP : " + hashedOtp);
 
-//                if (emailExists != null && Convert.ToInt32(emailExists) > 0)
-//                {
-//                    // Generate OTP
-//                    string otp = GenerateOtp();
-//                    int otpValue = int.Parse(otp);
-//                    string hashedOtp = OtpService.HashOtp(otpValue);
-//                    Console.WriteLine("Hashed OTP : " + hashedOtp);
+        //                    // Store the hashed OTP in memory for 2 minutes
+        //                    memoryCache.Set(request.Email, hashedOtp, TimeSpan.FromMinutes(2));
 
-//                    // Store the hashed OTP in memory for 2 minutes
-//                    memoryCache.Set(request.Email, hashedOtp, TimeSpan.FromMinutes(2));
+        //                    // Send OTP to the email
+        //                    bool emailSent = SendOtpToEmail(request.Email, otp);
 
-//                    // Send OTP to the email
-//                    bool emailSent = SendOtpToEmail(request.Email, otp);
+        //                    if (emailSent)
+        //                    {
+        //                        dtmain.Rows.Add("Success", "OTP sent to the email.");
+        //                    }
+        //                    else
+        //                    {
+        //                        dtmain.Rows.Add("Error", "OTP sending failed.");
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    // If email does not exist, return an error status
+        //                    dtmain.Rows.Add("Error", "Email does not exist.");
+        //                }
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                dtmain.Rows.Add("Error", ex.Message);
+        //            }
 
-//                    if (emailSent)
-//                    {
-//                        dtmain.Rows.Add("Success", "OTP sent to the email.");
-//                    }
-//                    else
-//                    {
-//                        dtmain.Rows.Add("Error", "OTP sending failed.");
-//                    }
-//                }
-//                else
-//                {
-//                    // If email does not exist, return an error status
-//                    dtmain.Rows.Add("Error", "Email does not exist.");
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                dtmain.Rows.Add("Error", ex.Message);
-//            }
-
-//            return DtToJSON(dtmain);
-//        }
+        //            return DtToJSON(dtmain);
+        //        }
 
         [HttpPost]
         public async Task<object> ForgotPasswordAsync(TravelAd_Api.Models.ApiModel.ForgotPasswordRequest request, [FromServices] IDbHandler dbHandler, [FromServices] IMemoryCache memoryCache)

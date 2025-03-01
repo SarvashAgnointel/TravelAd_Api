@@ -123,6 +123,7 @@ namespace TravelAd_Api.Controllers
                     workspaceId = row.Field<int>("workspace_id"),
                     workspaceName = row.Field<string>("workspace_name"),
                     roleId = row.Field<int>("role_id"),
+                    accountId = row.Field<int>("account_id"),
 
                 }).ToList();
 
@@ -144,7 +145,6 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
-
 
 
         [HttpGet]

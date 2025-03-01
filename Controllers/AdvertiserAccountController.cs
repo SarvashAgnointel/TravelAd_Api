@@ -1607,7 +1607,7 @@ namespace TravelAd_Api.Controllers
                 }
                 _logger.LogInformation("Found WhatsApp account details for EmailId: {EmailId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-                string url = $"https://graph.facebook.com/v21.0/{whatsappDetails.WabaId}/phone_numbers?fields=id,cc,country_dial_code,display_phone_number,verified_name,status,quality_rating,search_visibility,platform_type,code_verification_status&access_token={whatsappDetails.AccessToken}";
+                string url = $"{_configuration["facebookApiUrl"]}{whatsappDetails.WabaId}/phone_numbers?fields=id,cc,country_dial_code,display_phone_number,verified_name,status,quality_rating,search_visibility,platform_type,code_verification_status&access_token={whatsappDetails.AccessToken}";
 
 
                 Console.WriteLine(url);
@@ -1755,7 +1755,7 @@ namespace TravelAd_Api.Controllers
                     });
                 }
 
-                string url = $"https://graph.facebook.com/v21.0/{whatsappDetails.WabaId}?fields=id,name,currency,owner_business_info&access_token={whatsappDetails.AccessToken}";
+                string url = $"{_configuration["facebookApiUrl"]}{whatsappDetails.WabaId}?fields=id,name,currency,owner_business_info&access_token={whatsappDetails.AccessToken}";
                 _logger.LogInformation("Constructed Facebook API URL: {Url}", url);
                 Console.WriteLine(url);
 
@@ -3560,7 +3560,7 @@ namespace TravelAd_Api.Controllers
                 }
                 _logger.LogInformation("Found WhatsApp account details for workspaceId: {workspaceId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-                string url = $"https://graph.facebook.com/v21.0/{whatsappDetails.WabaId}/subscribed_apps";
+                string url = $"{_configuration["facebookApiUrl"]}{whatsappDetails.WabaId}/subscribed_apps";
 
                 // Construct the request body, if necessary
                 var requestBody = new
@@ -3631,7 +3631,7 @@ namespace TravelAd_Api.Controllers
                 }
                 _logger.LogInformation("Found WhatsApp account details for workspaceId: {workspaceId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-                string url = $"https://graph.facebook.com/v21.0/{whatsappDetails.WabaId}/subscribed_apps";
+                string url = $"{_configuration["facebookApiUrl"]}{whatsappDetails.WabaId}/subscribed_apps";
 
                 // Construct the request body (if needed), or if the API doesn't require one for DELETE, you can omit this
                 var requestBody = new
@@ -4430,7 +4430,7 @@ namespace TravelAd_Api.Controllers
                 }
                 _logger.LogInformation("Found WhatsApp account details for workspaceId: {workspaceId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-                string url = $"https://graph.facebook.com/v21.0/{phoneId}/register";
+                string url = $"{_configuration["facebookApiUrl"]}{phoneId}/register";
 
                 // Construct the request body, if necessary
                 var requestBody = new
@@ -4501,7 +4501,7 @@ namespace TravelAd_Api.Controllers
                 }
                 _logger.LogInformation("Found WhatsApp account details for workspaceId: {workspaceId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-                string url = $"https://graph.facebook.com/v21.0/{phoneId}/deregister";
+                string url = $"{_configuration["facebookApiUrl"]}{phoneId}/deregister";
 
                 // Construct the request body, if necessary
                 var requestBody = new
@@ -5654,7 +5654,7 @@ namespace TravelAd_Api.Controllers
         //        }
         //        _logger.LogInformation("Found WhatsApp account details for workspaceId: {workspaceId}. WabaId: {WabaId}", workspaceId, whatsappDetails.WabaId);
 
-        //        string url = $"https://graph.facebook.com/v21.0/{phoneId}/request_code";
+        //        string url = $"{_configuration["facebookApiUrl"]}{phoneId}/request_code";
 
         //        // Construct the request body, if necessary
         //        var requestBody = new
@@ -6608,9 +6608,9 @@ namespace TravelAd_Api.Controllers
                 _logger.LogInformation("Executing stored procedure: {ProcedureName}", storedProcedure);
 
                 var parameters = new Dictionary<string, object>
-   {
-       { "@Email", emailid }
-   };
+  {
+      { "@Email", emailid }
+  };
 
                 DataTable debitdetails = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
 
@@ -6642,10 +6642,11 @@ namespace TravelAd_Api.Controllers
                     var workspacedebitdetails = debitdetails.AsEnumerable()
                         .Select(row => new
                         {
-                            symbol = row.Field<string>("CurrencyName") ?? "", // Use CurrencyName instead of symbol
+                            symbol = row.Field<string>("CurrencySymbol") ?? "", // Use CurrencyName instead of symbol
                             Amount = row.Field<decimal>("TotalAmount"),
                             messagecount = row.Field<int>("TotalClosedCount"),
-                            paymentdate = row.Field<string>("paymentdate") ?? ""
+                            paymentdate = row.Field<string>("paymentdate") ?? "",
+                            lastcampaign_enddate = row.Field<string>("lastcampaignenddate")
                         }).ToArray();
 
                     return Ok(new
@@ -6672,6 +6673,7 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
+
 
         [HttpGet]
         public IActionResult GetBillingDetailsById(int BillingId, [FromServices] IDbHandler dbHandler)

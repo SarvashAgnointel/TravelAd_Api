@@ -4257,6 +4257,60 @@
         }
       }
     },
+    "/api/webhook/campaign-status": {
+      "post": {
+        "tags": [
+          "CampaignWebhook"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignStatusUpdate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignStatusUpdate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/webhook/live-campaigns/{workspaceId}": {
+      "get": {
+        "tags": [
+          "CampaignWebhook"
+        ],
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/Operator/api/GetCampaignListOperator": {
       "get": {
         "tags": [
@@ -4970,6 +5024,24 @@
           "example": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CampaignStatusUpdate": {
+        "type": "object",
+        "properties": {
+          "campaignId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "workspaceId": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
