@@ -287,6 +287,11 @@ namespace TravelAd_Api.Models
                 public string AccessToken { get; set; }
             }
 
+            public class AdvancedServerDetails
+            {
+                public int serverId { get; set; }
+            }
+
             public class PhoneNumber
             {
                 public string id { get; set; }
@@ -431,6 +436,15 @@ namespace TravelAd_Api.Models
             [JsonPropertyName("Columns")]
             public string Columns { get; set; }
         }
+
+        public class GetOperatorsByCountryRequest
+        {
+            public List<int> CountryIds { get; set; }  //  (country ID, [1, 2, 3])
+            public List<string> ToCountryNames { get; set; } //Country Names (e.g., ["India", "USA"])
+
+            public int CampaignId { get; set; }
+        }
+
 
     }
     }

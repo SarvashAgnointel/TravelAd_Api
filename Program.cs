@@ -65,10 +65,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<Dialler>();
 
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    options.Listen(System.Net.IPAddress.Parse("0.0.0.0"), 5000);  // Replace with your IP address and port
-//});
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 builder.Services.AddScoped<JWT>();
 builder.Services.Configure<Stripesettings>(builder.Configuration.GetSection("Stripe"));

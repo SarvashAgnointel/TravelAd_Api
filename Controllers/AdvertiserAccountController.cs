@@ -2840,6 +2840,90 @@ namespace TravelAd_Api.Controllers
             }
         }
 
+
+        [HttpPost]
+        public IActionResult GetOperatorsByCountry([FromServices] IDbHandler dbHandler, [FromBody] GetOperatorsByCountryRequest request)
+        {
+            if (request == null || request.CountryIds == null || request.ToCountryNames == null)
+            {
+                return BadRequest(new { Status = "Error", Message = "Both CountryIds and ToCountryNames are required." });
+            }
+
+            try
+            {
+                string storedProcedure = "GetOperatorsByCountry";
+                _logger.LogInformation($"Executing stored procedure: {storedProcedure}");
+
+                // ✅ Convert CountryIds List<int> to JSON string format (e.g., "[1,2,3,4]")
+                string formattedCountryJson = JsonConvert.SerializeObject(request.CountryIds);
+
+                // ✅ Convert ToCountryNames List<string> to JSON string format (e.g., "["India","USA"]")
+                string formattedToCountryJson = JsonConvert.SerializeObject(request.ToCountryNames);
+
+                var parameters = new Dictionary<string, object>
+    {
+        { "@CountryJson", formattedCountryJson },
+        { "@ToCountryJson", formattedToCountryJson }
+    };
+
+                _logger.LogInformation($"Executing with parameters: {parameters}");
+
+                // Execute the stored procedure and retrieve the result
+                DataTable result = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
+
+                // Convert DataTable to List of objects
+                var operators = result.AsEnumerable().Select(row => new
+                {
+                    CountryName = row["countryName"].ToString(),
+                    Msisdn = row["msisdn"].ToString(),
+                    ContactId = Convert.ToInt32(row["contact_id"]),
+                    ListId = Convert.ToInt32(row["list_id"]),
+                    FileName = row["fileName"].ToString(),
+                    WorkspaceId = Convert.ToInt32(row["workspace_id"])
+                }).ToList();
+
+
+                _logger.LogInformation($"Stored Procedure Result Count: {result.Rows.Count}");
+
+                foreach (var op in operators)
+                {
+                    var insertParameters = new Dictionary<string, object>
+{
+    { "@ListId", op.ListId },
+    { "@FirstName", "UnKnown" },
+    { "@Contact_id",op.ContactId},
+    { "@LastName", "UnKnown" },
+    { "@PhoneNo", op.Msisdn },
+    { "@Location", op.CountryName },
+    { "@FileName", op.FileName },
+    { "@CampaignId", request.CampaignId },
+    { "@Status", "Open" }
+};
+                    string storedProcedure1 = "InsertCampaignContacts";
+                    dbHandler.ExecuteNonQuery(storedProcedure1, insertParameters, CommandType.StoredProcedure);
+                }
+                _logger.LogInformation($"Retrieved {operators.Count} operators.");
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Operators retrieved successfully.",
+                    Data = operators
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to retrieve operators. Error: {ex.Message}");
+
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while fetching operators: {ex.Message}"
+                });
+            }
+        }
+
+
         [HttpPost, DisableRequestSizeLimit]
         public object contact_upload([FromServices] IDbHandler dbHandler)
         {
@@ -4654,6 +4738,7 @@ namespace TravelAd_Api.Controllers
                     country_id = row.Field<int?>("country_id"),
                     country_name = row.Field<string>("country_name"),
                     currency_name = row.Field<string>("currency_name"),
+                    symbol = row.Field<string>("symbol"),
 
                 }).ToList();
 
@@ -4677,7 +4762,6 @@ namespace TravelAd_Api.Controllers
                 });
             }
         }
-
 
 
         [HttpGet]

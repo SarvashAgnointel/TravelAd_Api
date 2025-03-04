@@ -317,7 +317,7 @@ namespace AgnoCon.Controllers
                     var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                     // Resend endpoint
-                    string resendApiUrl = "https://api.resend.com/emails";
+                    string resendApiUrl = _configuration["ResendApiUrl"];
 
                     // Send the POST request
                     HttpResponseMessage response = await client.PostAsync(resendApiUrl, content);
@@ -881,7 +881,7 @@ namespace AgnoCon.Controllers
 
                 var token = GenerateInviteToken(payloadData);
 
-                string inviteUrl = $"{_configuration["FrontendUrl"]}/signup?token={token}";
+                string inviteUrl = $"{_configuration["FrontendUrl"]}signup?token={token}";
 
                 bool emailSent = await SendInviteEmail(request.Email, inviteUrl);
 

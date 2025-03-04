@@ -20,11 +20,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 public class Dialler
 {
     private readonly IDbHandler _dbHandler;
-
+    private readonly HttpClient _httpClient;
     // Constructor to inject the DbHandler dependency
-    public Dialler(IDbHandler dbHandler)
+    public Dialler(IDbHandler dbHandler, HttpClient httpClient)
     {
         _dbHandler = dbHandler;
+        _httpClient = httpClient;
     }
     private WhatsappAccountDetails GetWhatsappAccountDetailsByWId(int workspaceId)
     {
@@ -75,6 +76,32 @@ public class Dialler
         }
     }
 
+
+    public static string GetServerUrl(int ServerId, IDbHandler dbHandler)
+    {
+        string procedure = "GetServerUrl";
+        var parameters = new Dictionary<string, object>
+                {
+                    {"@ServerId",ServerId },
+                };
+
+        DataTable UrlList = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
+
+        if (UrlList == null || UrlList.Rows.Count == 0)
+        {
+            return "";
+        }
+
+        var UrlListData = UrlList.AsEnumerable().Select(row => new
+        {
+            url = row.Field<string>("server_url"),
+        }).ToList();
+
+        return UrlListData[0].url;
+
+    }
+
+
     // Method to process campaigns asynchronously
     public async Task ProcessCampaignsAsync()
     {
@@ -88,7 +115,7 @@ public class Dialler
                 if (dt.Rows.Count > 0)
                 {
                     var messageCounter = new MessageCounter();
-                    var campaignData = new List<(string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate, string endDate, string messageFrequency, string deliveryStartTime, string deliveryEndTime, string workspaceInfoId, int serverId, string smsNumber, int campaignBudget)>();
+                    var campaignData = new List<(string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate, string endDate, string messageFrequency, string deliveryStartTime, string deliveryEndTime, string workspaceInfoId, int serverId, int connectionId, string smsNumber, int campaignBudget)>();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -108,6 +135,7 @@ public class Dialler
                             deliveryEndTime: row["delivery_end_time"].ToString(),
                             workspaceInfoId: row["workspace_id"].ToString(),
                             serverId: Convert.ToInt32(row["smpp_id"]),
+                            connectionId: Convert.ToInt32(row["sms_connection_id"]),
                             smsNumber: row["sms_number"].ToString(),
                             campaignBudget: Convert.ToInt32(row["campaign_budget"])
 
@@ -156,7 +184,7 @@ public class Dialler
                             {
                                 if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                 {
-                                    RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
+                                    RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.connectionId, campaign.smsNumber, campaign.endDate), messageCounter);
 
                                 }
                                 else
@@ -174,7 +202,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.connectionId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -196,7 +224,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.connectionId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -224,7 +252,7 @@ public class Dialler
                                 {
                                     if (currentTime >= deliveryStartTime && currentTime <= deliveryEndTime)
                                     {
-                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.smsNumber, campaign.endDate), messageCounter);
+                                        RunCampaign((campaign.campaignId, campaign.listId, campaign.firstName, campaign.lastName, campaign.phoneNo, campaign.campaignName, campaign.templateName, campaign.channelType, campaign.startDate, campaign.serverId, campaign.connectionId, campaign.smsNumber, campaign.endDate), messageCounter);
                                         //Console.WriteLine($"Running campaign {campaign.campaignId} - Cycle {cycleNumber + 1}, Day {dayInCycle + 1} of active period");
                                     }
                                     else
@@ -313,7 +341,7 @@ public class Dialler
 
     private async void RunCampaign(
       (string campaignId, string listId, string firstName, string lastName, string phoneNo,
-      string campaignName, string templateName, string channelType, string startDate, int serverId, string smsNumber, string endDate) campaign,
+      string campaignName, string templateName, string channelType, string startDate, int serverId, int connectionId, string smsNumber, string endDate) campaign,
       MessageCounter messageCounter)
     {
         var parameters = new Dictionary<string, object>
@@ -347,7 +375,7 @@ public class Dialler
     }
 
 
-    private async Task ProcessCampaign((string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate,int serverId, string smsNumber, string endDate) campaign, MessageCounter messageCounter)
+    private async Task ProcessCampaign((string campaignId, string listId, string firstName, string lastName, string phoneNo, string campaignName, string templateName, string channelType, string startDate,int serverId, int connectionId, string smsNumber, string endDate) campaign, MessageCounter messageCounter)
     {
         try
         {
@@ -361,6 +389,7 @@ public class Dialler
                 // Call WhatsApp_contacts_dialAsync
                 await WhatsApp_contacts_dialAsync(
                     _dbHandler,
+                    _httpClient,
                     campaign.listId,
                     campaign.campaignId,
                     campaign.campaignName,
@@ -379,6 +408,7 @@ public class Dialler
                 // Call WhatsApp_contacts_dialAsync
                 await SMS_contacts_dialAsync(
                     _dbHandler,
+                    _httpClient,
                     campaign.listId,
                     campaign.campaignId,
                     campaign.campaignName,
@@ -388,6 +418,7 @@ public class Dialler
                     campaign.endDate,
                     campaign.templateName,
                     campaign.serverId,
+                    campaign.connectionId,
                     campaign.smsNumber,
                     messageCounter
                 );
@@ -720,7 +751,7 @@ public class Dialler
             .Replace("{{3}}", pdfLink ?? "");
     }
 
-    private static async Task WhatsApp_contacts_dialAsync([FromServices] IDbHandler dbHandler,
+    private static async Task WhatsApp_contacts_dialAsync([FromServices] IDbHandler dbHandler, HttpClient httpClient,
        string listid,
        string campaignid,
        string campaign_name,
@@ -758,7 +789,7 @@ public class Dialler
             // Now you can use workspaceid as needed
             Console.WriteLine("Workspace ID: " + workspaceid);
 
-            Dialler dialler = new Dialler(dbHandler);
+            Dialler dialler = new Dialler(dbHandler,httpClient);
 
 
 
@@ -846,7 +877,7 @@ public class Dialler
 
     }
 
-    private static async Task SMS_contacts_dialAsync([FromServices] IDbHandler dbHandler,
+    private static async Task SMS_contacts_dialAsync([FromServices] IDbHandler dbHandler, HttpClient httpClient,
         string listid,
         string campaignid,
         string campaign_name,
@@ -856,6 +887,7 @@ public class Dialler
         string end_time,
         string templateName,
         int serverId,
+        int connectionId,
         string smsNumber,
         MessageCounter messageCounter)
     {
@@ -894,14 +926,23 @@ public class Dialler
             int workspaceid = Convert.ToInt32(dt.Rows[0]["workspace_id"]);
             Console.WriteLine("Workspace ID: " + workspaceid);
 
-            Dialler dialler = new Dialler(dbHandler);
+            Dialler dialler = new Dialler(dbHandler,httpClient);
 
             // Ensure serverId is not null
-            if (serverId == 0)
+            if (serverId == 0 || connectionId == 0)
             {
-                Console.WriteLine("No WhatsApp account details found for workspace ID: " + workspaceid);
+                Console.WriteLine("No SMS channel details found for workspace ID: " + workspaceid);
                 return;
             }
+
+            
+            DataTable AdvancedSMSSettings = dbHandler.ExecuteDataTable($"EXEC getAdvanceSMSConnection {connectionId}");
+
+            int senderTON = Convert.ToInt32(AdvancedSMSSettings?.Rows[0]["sender_ton"]);
+            int senderNPI = Convert.ToInt32(AdvancedSMSSettings?.Rows[0]["sender_ton"]);
+            int receiverTON = Convert.ToInt32(AdvancedSMSSettings?.Rows[0]["sender_ton"]);
+            int receiverNPI = Convert.ToInt32(AdvancedSMSSettings?.Rows[0]["sender_ton"]);
+
 
             // Loop through all campaign contacts
             for (int i = 0; i < dtmain.Rows.Count; i++)
@@ -913,7 +954,8 @@ public class Dialler
                 string location = dtmain.Rows[i]["location"].ToString();
 
                 // Construct the URL
-                var otherProjectBaseUrl = config["OtherProject:BaseUrl"];
+
+                var otherProjectBaseUrl = GetServerUrl(serverId,dbHandler);
                 var url = $"{otherProjectBaseUrl}/Message/api/send";
 
                 try
@@ -924,37 +966,27 @@ public class Dialler
                         Sender = smsNumber,  // Replace with the actual sender ID
                         Receiver = callernumber,
                         Message = componentList[0].text,  // Extracted text from the components JSON
-                        ChannelId = serverId
+                        ChannelId = serverId,
+                        SenderTON = senderTON,
+                        SenderNPI = senderNPI,
+                        ReceiverTON = receiverTON,
+                        ReceiverNPI = receiverNPI
                     };
 
                     // Serialize the payload into JSON format
-                    var jsonMessage = JsonConvert.SerializeObject(messagePayload);
+                    //var jsonMessage = JsonConvert.SerializeObject();
+                    var jsonContent = new StringContent(JsonConvert.SerializeObject(messagePayload), Encoding.UTF8, "application/json");
 
-                    // Create the HTTP WebRequest
-                    var request = (HttpWebRequest)WebRequest.Create(url);
-                    request.Method = "POST";  // Set method to POST
-                    request.ContentType = "application/json";  // Content type is JSON
-                    request.ContentLength = jsonMessage.Length;
+                    
 
-                    // Write the JSON message to the request stream
-                    using (var stream = request.GetRequestStream())
-                    {
-                        byte[] data = Encoding.UTF8.GetBytes(jsonMessage);
-                        stream.Write(data, 0, data.Length);
-                    }
+
 
                     // Get the response from the API
-                    using (var response = (HttpWebResponse)request.GetResponse())
+                    using (var response = await httpClient.PostAsync(url, jsonContent))
                     {
                         // Log the response status code
                         Console.WriteLine("Response Status: " + response.StatusCode);
 
-                        // Read and log the response content
-                        using (var reader = new StreamReader(response.GetResponseStream()))
-                        {
-                            string responseContent = reader.ReadToEnd();
-                            Console.WriteLine("Response Content: " + responseContent);
-                        }
                     }
 
                     // Increment message counter and log the result

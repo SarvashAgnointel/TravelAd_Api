@@ -110,12 +110,54 @@
   },
   {
     "ContainingType": "TravelAd_Api.Controllers.AdminController",
+    "Method": "GetAllCountriesWithCurrencyName",
+    "RelativePath": "Admin/api/GetAllCountriesWithCurrencyName",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdminController",
+    "Method": "GetAmountSpentonAdCampaigns",
+    "RelativePath": "Admin/api/GetAmountSpentonAdCampaigns",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "currencyName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdminController",
     "Method": "GetAudienceList",
     "RelativePath": "Admin/api/GetAudienceList",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdminController",
+    "Method": "GetBillingCountryandSymbol",
+    "RelativePath": "Admin/api/GetBillingCountryandSymbol",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -1328,6 +1370,22 @@
         "Name": "EmailId",
         "Type": "System.String",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TravelAd_Api.Controllers.AdvertiserAccountController",
+    "Method": "GetOperatorsByCountry",
+    "RelativePath": "AdvertiserAccount/api/GetOperatorsByCountry",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "TravelAd_Api.Models.AdvertiserAccountModel\u002BGetOperatorsByCountryRequest",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []

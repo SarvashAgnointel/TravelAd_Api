@@ -1215,6 +1215,186 @@ namespace TravelAd_Api.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetBillingCountryandSymbol([FromServices] IDbHandler dbHandler, int accountId)
+        {
+            try
+            {
+                string procedure = "GetBillingCountryandSymbol";
+                _logger.LogInformation("Executing stored procedure: {procedure}", procedure);
+                var parameters = new Dictionary<string, object>
+                 {
+                     { "@accountid", accountId }
+                 };
+                _logger.LogInformation("Stored procedure parameters: {Parameters}", parameters);
+                DataTable billingInfo = dbHandler.ExecuteDataTable(procedure, parameters, CommandType.StoredProcedure);
+
+                if (billingInfo == null || billingInfo.Rows.Count == 0)
+                {
+                    _logger.LogWarning("No billing information found for account");
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No billing information found for account"
+                    });
+                }
+
+                // Check if there's an error message returned by the stored procedure
+                if (billingInfo.Columns.Contains("Message"))
+                {
+                    string errorMessage = billingInfo.Rows[0].Field<string>("Message");
+                    _logger.LogWarning("Stored procedure returned an error: {ErrorMessage}", errorMessage);
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = errorMessage
+                    });
+                }
+
+                var billingData = billingInfo.Rows[0];
+                var billingInfoData = new
+                {
+                    currencyName = billingData.Field<string>("CurrencyName"),
+                    currencySymbol = billingData.Field<string>("CurrencySymbol")
+                };
+
+                _logger.LogInformation("Billing information retrieved successfully, Response: {Response}", billingInfoData);
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Billing information retrieved successfully",
+                    BillingInfo = billingInfoData
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while retrieving billing information: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving billing information: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult GetAllCountriesWithCurrencyName([FromServices] IDbHandler dbHandler)
+        {
+            try
+            {
+                string getCountryListWithCurrencyName = "GetAllCountriesWithCurrencyName";
+                _logger.LogInformation("Executing stored procedure: {StoredProcedureName}", getCountryListWithCurrencyName);
+
+                DataTable countryListWithCurrency = dbHandler.ExecuteDataTable(getCountryListWithCurrencyName);
+
+                if (countryListWithCurrency == null || countryListWithCurrency.Rows.Count == 0)
+                {
+                    _logger.LogInformation("No countries found in the database.");
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No countries found"
+                    });
+                }
+                var countryListWithCurrencyData = countryListWithCurrency.AsEnumerable().Select(row => new
+                {
+                    country_id = row.Field<int>("country_id"),
+                    country_name = row.Field<string>("country_name"),
+                    currency_name = row.Field<string>("currency_name")
+                }).ToList();
+
+                _logger.LogInformation("Countries retrieved successfully .{countryListWithCurrencyData}", countryListWithCurrencyData);
+
+                return Ok(new
+                {
+                    Status = "Success",
+                    Status_Description = "Countries retrieved successfully",
+                    CountryList = countryListWithCurrencyData
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving the country list.");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving the country list: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAmountSpentonAdCampaigns([FromServices] IDbHandler dbHandler, string currencyName)
+        {
+            try
+            {
+                string storedProcedure = "GetAmountSpentonAdCampaigns";
+                _logger.LogInformation("Executing stored procedure: {ProcedureName}", storedProcedure);
+
+                var parameters = new Dictionary<string, object>
+{
+    { "@currencyname", currencyName }
+};
+
+                DataTable spResult = dbHandler.ExecuteDataTable(storedProcedure, parameters, CommandType.StoredProcedure);
+
+                if (spResult == null || spResult.Rows.Count == 0)
+                {
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = "No ad campaign spending data found",
+                        campaign_spending = new List<object>()
+                    });
+                }
+
+                // Check if this is an error message from the stored procedure
+                if (spResult.Columns.Contains("Message"))
+                {
+                    string message = spResult.Rows[0]["Message"].ToString();
+                    return Ok(new
+                    {
+                        Status = "Failure",
+                        Status_Description = message,
+                        campaign_spending = new List<object>()
+                    });
+                }
+
+                // If we get here, we should have the normal result set
+                try
+                {
+                    var adCampaignSpending = new
+                    {
+                        currency_name = spResult.Rows[0]["Currency_Name"].ToString(),
+                        currency_symbol = spResult.Rows[0]["Currency_Symbol"].ToString(),
+                        total_amount_spent = Convert.ToDecimal(spResult.Rows[0]["Total_Amount_Spent"])
+                    };
+
+                    return Ok(new
+                    {
+                        Status = "Success",
+                        Status_Description = "Ad campaign spending retrieved successfully",
+                        campaign_spending = adCampaignSpending
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing result set. Columns available: {Columns}",
+                        string.Join(", ", spResult.Columns.Cast<DataColumn>().Select(c => c.ColumnName)));
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving ad campaign spending data");
+                return StatusCode(500, new
+                {
+                    Status = "Error",
+                    Status_Description = $"An error occurred while retrieving ad campaign spending data: {ex.Message}"
+                });
+            }
+        }
 
 
     }
